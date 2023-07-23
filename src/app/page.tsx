@@ -20,7 +20,7 @@ function App() {
       <Authenticator signUpAttributes={['email']}>
         {({ signOut, user }) => (
             <div>
-              <p>Welcome {user.username}</p>
+              <p>Welcome {user?.username}</p>
               <button onClick={signOut}>Sign out</button>
             </div>
         )}
