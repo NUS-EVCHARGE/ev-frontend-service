@@ -2,7 +2,7 @@
 import {Amplify} from 'aws-amplify';
 import awsExports from "./aws-exports";
 
-import Authenticate from './Login/authenticate';
+import Authenticate from './login/authenticate';
 
 // Configure Amplify in index file or root file
 Amplify.configure({

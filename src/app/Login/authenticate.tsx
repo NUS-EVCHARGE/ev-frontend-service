@@ -1,7 +1,7 @@
 import { Authenticator, Divider, Heading } from '@aws-amplify/ui-react';
 import '@aws-amplify/ui-react/styles.css';
 import { getJwtToken } from '../utils';
-import { Suspense, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 function Authenticate() {
   const [token, setToken] = useState('');
@@ -10,7 +10,9 @@ function Authenticate() {
 
     async function getToken() {
       const jwtToken = await getJwtToken();
-      setToken(jwtToken);
+      if (jwtToken) {
+        setToken(jwtToken);
+      }
     };
 
     if (!token) {
