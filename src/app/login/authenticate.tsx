@@ -1,4 +1,4 @@
-import { Authenticator, Divider, Heading } from '@aws-amplify/ui-react';
+import { Authenticator, } from '@aws-amplify/ui-react';
 import '@aws-amplify/ui-react/styles.css';
 import { getJwtToken } from '../utils';
 import { useEffect, useState } from 'react';
