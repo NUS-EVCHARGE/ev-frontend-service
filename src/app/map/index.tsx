@@ -6,15 +6,21 @@ import {
 } from "@react-google-maps/api";
 import { useEffect, useState } from "react";
 
-const Map = () => {
+export interface ChargingStation {
+  id: number;
+  address: string;
+  lat: number;
+  lng: number;
+}
+
+export interface ChargingStationArray extends Array<ChargingStation> {}
+
+const Map: React.FC<{ chargingStations: ChargingStationArray }> = ({
+  chargingStations,
+}) => {
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: String(process.env.NEXT_PUBLIC_REACT_APP_GOOGLE_API_KEY),
   });
-
-  const markers = [
-    { address: "Address1", lat: 1.2922, lng: 103.7766 },
-    { address: "Address2", lat: 1.3332674, lng: 103.6367302 },
-  ];
 
   const [mapRef, setMapRef] = useState<google.maps.Map>();
   const [isOpen, setIsOpen] = useState(false);
@@ -52,7 +58,7 @@ const Map = () => {
   const onMapLoad = (map: google.maps.Map) => {
     setMapRef(map);
     const bounds = new google.maps.LatLngBounds();
-    markers?.forEach(({ lat, lng }) => bounds.extend({ lat, lng }));
+    chargingStations?.forEach(({ lat, lng }) => bounds.extend({ lat, lng }));
     if (currentLocation !== null) {
       bounds.extend({
         lat: currentLocation?.latitude,
@@ -98,15 +104,15 @@ const Map = () => {
           onLoad={onMapLoad}
           onClick={() => setIsOpen(false)}
         >
-          {markers.map(({ address, lat, lng }, ind) => (
+          {chargingStations.map(({ id, address, lat, lng }) => (
             <Marker
-              key={ind}
+              key={id}
               position={{ lat, lng }}
               onClick={() => {
-                handleMarkerClick(ind, lat, lng, address);
+                handleMarkerClick(id, lat, lng, address);
               }}
             >
-              {isOpen && infoWindowData?.id === ind && (
+              {isOpen && infoWindowData?.id === id && (
                 <InfoWindow
                   onCloseClick={() => {
                     setIsOpen(false);
