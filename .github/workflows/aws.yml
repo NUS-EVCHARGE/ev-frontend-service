@@ -7,12 +7,14 @@ jobs:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       CONFIG_FILE: '.env'
+      NEXT_PUBLIC_REACT_APP_GOOGLE_API_KEY: ${{ secrets.NEXT_PUBLIC_REACT_APP_GOOGLE_API_KEY }}
+
     steps:
         - uses: actions/checkout@v3
 
         - name: Update env variable in config.js
           run: |
-            sed -i "s|GOOGLE_API_KEY|${{ secrets.NEXT_PUBLIC_REACT_APP_GOOGLE_API_KEY }}|g" $CONFIG_FILE
+            # sed -i "s|GOOGLE_API_KEY|${{ secrets.NEXT_PUBLIC_REACT_APP_GOOGLE_API_KEY }}|g" $CONFIG_FILE
             cat $CONFIG_FILE
 
         - name: Install dependencies
