@@ -16,9 +16,9 @@ const Map = () => {
     { address: "Address2", lat: 1.2926, lng: 103.7742 },
   ];
 
-  const [mapRef, setMapRef] = useState();
+  const [mapRef, setMapRef] = useState<google.maps.Map>();
   const [isOpen, setIsOpen] = useState(false);
-  const [infoWindowData, setInfoWindowData] = useState();
+  const [infoWindowData, setInfoWindowData] = useState<{id: number, address: string}>();
 
   const handleMarkerClick = (id : number, lat : number, lng: number, address: string) => {
     mapRef?.panTo({ lat, lng });
@@ -65,7 +65,7 @@ const Map = () => {
                     setIsOpen(false);
                   }}
                 >
-                  <h3 style={{ color: "black" }}>{infoWindowData.address}</h3>
+                  <h3 style={{ color: "black" }}>{infoWindowData?.address}</h3>
                 </InfoWindow>
               )}
             </Marker>
