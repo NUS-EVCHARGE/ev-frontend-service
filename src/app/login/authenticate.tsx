@@ -2,6 +2,7 @@ import { Authenticator, } from '@aws-amplify/ui-react';
 import '@aws-amplify/ui-react/styles.css';
 import { getJwtToken } from '../utils';
 import { useEffect, useState } from 'react';
+import Map from '../map';
 
 function Authenticate() {
   const [token, setToken] = useState('');
@@ -26,8 +27,8 @@ function Authenticate() {
         <div>
           <p>Welcome {user?.username}</p>
           <p>Email: {user?.attributes?.email}</p>
-          <p>{token}</p>
           <button onClick={signOut}>Sign out</button>
+          <Map />
         </div>
       )}
     </Authenticator>
