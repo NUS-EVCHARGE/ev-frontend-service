@@ -12,11 +12,6 @@ jobs:
     steps:
         - uses: actions/checkout@v3
 
-        - name: Update env variable in config.js
-          run: |
-            # sed -i "s|GOOGLE_API_KEY|${{ secrets.NEXT_PUBLIC_REACT_APP_GOOGLE_API_KEY }}|g" $CONFIG_FILE
-            cat $CONFIG_FILE
-
         - name: Install dependencies
           run: yarn
 
