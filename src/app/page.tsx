@@ -1,8 +1,8 @@
 "use client";
-import {Amplify} from 'aws-amplify';
+import { Amplify } from 'aws-amplify';
 import awsExports from "./aws-exports";
-
-import Authenticate from './login/authenticate';
+import { ChargingStationArray } from './map';
+import Map from './map';
 
 // Configure Amplify in index file or root file
 Amplify.configure({
@@ -13,11 +13,14 @@ Amplify.configure({
   }
 })
 
+const markers: ChargingStationArray = [
+  { id: 1, address: "Address1", lat: 1.2922, lng: 103.7766 },
+  { id: 2, address: "Address2", lat: 1.3332674, lng: 103.6367302 },
+];
+
 function App() {
   return (
-    <div className="App">
-      <Authenticate />
-    </div>
+    <Map chargingStations={markers} />
   );
 }
 

@@ -13,6 +13,7 @@ function Authenticate() {
     { id: 2, address: "Address2", lat: 1.3332674, lng: 103.6367302 },
   ];
 
+
   useEffect(() => {
 
     async function getToken() {
@@ -30,12 +31,14 @@ function Authenticate() {
   return (
     <Authenticator signUpAttributes={['email']}>
       {({ signOut, user }) => (
+
+
         <div>
           <p>Welcome {user?.username}</p>
           <p>Email: {user?.attributes?.email}</p>
           <button onClick={signOut}>Sign out</button>
-          
-          <Map chargingStations={markers}/>
+
+          <Map chargingStations={markers} />
         </div>
       )}
     </Authenticator>
