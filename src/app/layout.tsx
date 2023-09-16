@@ -53,10 +53,7 @@ export default function RootLayout({
       getToken();
     }
   }, []);
-  const nav = (e) => {
 
-    useRouter().push("/")
-  }
   return (
     <html lang="en">
       <body className={inter.className}>
@@ -83,7 +80,7 @@ export default function RootLayout({
                     {
                       key: '3',
                       icon: <MoneyCollectOutlined />,
-                      label: 'Payment',
+                      label: <Link href="/bill"> Bill </Link>
                     },
                     {
                       key: '4',
