@@ -84,6 +84,11 @@ export default function RootLayout({
                     },
                     {
                       key: '4',
+                      icon: <MoneyCollectOutlined />,
+                      label: <Link href="/admin"> Admin </Link>
+                    },
+                    {
+                      key: '5',
                       icon: <LogoutOutlined />,
                       label: 'sign out',
                       danger: true,
@@ -112,6 +117,7 @@ export default function RootLayout({
                     margin: '24px 16px',
                     padding: 24,
                     background: colorBgContainer,
+                    overflow: 'auto'
                   }}
                 >
                   {children}
