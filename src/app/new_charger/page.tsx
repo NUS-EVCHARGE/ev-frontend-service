@@ -68,25 +68,28 @@ export default function ChargerForm() {
             <form style={formStyles}>
                 <label style={labelStyles}>
                     Charger Id: 
-                    <input type="text" placeholder="Charger Id" value={charger_id}/>
+                    <input type="text" style={inputStyles} placeholder="Charger Id" value={charger_id}/>
                 </label>
                 <label style={labelStyles}>
                     Rates Id: 
-                    <input type="text" placeholder="Rates Id" value={rates_id}/>
+                    <input type="text" style={inputStyles} placeholder="Rates Id" value={rates_id}/>
                 </label>
             <label style={labelStyles}>
                 Address: 
                 <input
                     type="text"
+                    style={inputStyles}
                     placeholder="Enter address"
                     value={address}
                     onChange={handleAddressChange}
                 />
+                
             </label>
-            
+            <br/>
             <button style={buttonStyle} onClick={handleGetCoordinates}>Get Coordinates</button>
             <div style={labelStyles}>
-                Latitude: {coordinates.lat}, Longitude: {coordinates.lng}
+                Latitude: {coordinates.lat} <br/>
+                Longitude: {coordinates.lng}
             </div>
             </form>
         </div>
