@@ -1,9 +1,5 @@
 'use client'
-import { useEffect, useState } from "react";
 import { Card, Button, List, Avatar } from "antd"
-// import { AddCharger } from "./addCharger";
-import { NewPage } from "./newPage";
-// import { newCharger } from "./new_charger"
 import { useRouter } from 'next/navigation';
 
 function ChargerDetails({ user }: any) {
@@ -11,7 +7,7 @@ function ChargerDetails({ user }: any) {
     const router = useRouter();
 
     const navigateToAddChargerPage = () => {
-        router.push('/new_charger');
+        router.push('/newcharger');
     };
 
     const data = [
@@ -29,8 +25,9 @@ function ChargerDetails({ user }: any) {
         },
     ];
     return (
-        <Card type="inner" title="Chargers" 
-        extra={<Button onClick={navigateToAddChargerPage}>Add Charger</Button>}>
+        <Card type="inner" title="Chargers" extra={<Button onClick={navigateToAddChargerPage}>
+            Add Charger
+        </Button>}>
 
             <List
                 pagination={{ position: 'bottom', align: 'center' }}
