@@ -3,8 +3,10 @@
 import React from "react";
 import { useState } from "react";
 import axios from "axios";
-import { Input, Space } from 'antd';
+import { Input, Space, Button, Typography } from 'antd';
 const { Search } = Input;
+const { Paragraph } = Typography;
+const { Title } = Typography;
 
 export default function ChargerForm() {
     const [coordinates, setCoordinates] = useState({ lat: null, 
@@ -34,18 +36,26 @@ export default function ChargerForm() {
 
     return (
         <div>
-          <Space direction="vertical" style={{}}>
-            <Input placeholder="Charger Id" style={{ width: 200 , padding: '5px'}} onChange={(e) => setChargerId(e.target.value)}/>
-            <Input placeholder="Rates Id" style={{ width: 200 , padding: '5px'}} onChange={(e) => setRatesId(e.target.value)}/>
+          <Space direction="vertical">
+            <Title level={2}>Add rates</Title>
+            <Input placeholder="Normal Rate" style={{ width: 200 , padding: '5px'}} onChange={(e) => setRatesId(e.target.value)}/>
+            <Input placeholder="Penalty Rate" style={{ width: 200 , padding: '5px'}} onChange={(e) => setRatesId(e.target.value)}/>
+            <Input placeholder="No Show Rate" style={{ width: 200 , padding: '5px'}} onChange={(e) => setRatesId(e.target.value)}/>
+            <Button>Submit</Button>
+
+            <Title level={2}>Add charger</Title>
+            <Input placeholder="Rate Id" style={{ width: 200 , padding: '5px'}} onChange={(e) => setRatesId(e.target.value)}/>
             <Search
               placeholder="Enter address"
               onSearch={value => handleGetCoordinates(value)}
               style={{ width: 200 , padding: '5px'}}
             />
-            <div style={{ color: 'black'}}>
-                Latitude: {coordinates.lat} <br/>
-                Longitude: {coordinates.lng}
-            </div>
+            {
+              coordinates.lat !== null && coordinates.lng !== null && (
+                <Paragraph copyable>{coordinates.lat} {coordinates.lng}</Paragraph>
+              )
+            }
+            <Button>Submit</Button>
           </Space>
         </div>
     )
