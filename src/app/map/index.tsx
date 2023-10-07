@@ -13,7 +13,7 @@ export interface ChargingStation {
   lng: number;
 }
 
-export interface ChargingStationArray extends Array<ChargingStation> {}
+export interface ChargingStationArray extends Array<ChargingStation> { }
 
 const Map: React.FC<{ chargingStations: ChargingStationArray }> = ({
   chargingStations,
@@ -87,20 +87,12 @@ const Map: React.FC<{ chargingStations: ChargingStationArray }> = ({
   };
 
   return (
-    <div
-      style={{
-        height: "100vh",
-        width: "100vw",
-      }}
-    >
+    <div style={{ height: "100%" }}>
       {!isLoaded ? (
         <h1>Loading...</h1>
       ) : (
         <GoogleMap
-          mapContainerStyle={{
-            height: "100%",
-            width: "100%",
-          }}
+          mapContainerStyle={{ height: "100%" }}
           onLoad={onMapLoad}
           onClick={() => setIsOpen(false)}
         >
