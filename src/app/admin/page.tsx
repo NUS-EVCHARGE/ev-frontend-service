@@ -1,5 +1,5 @@
 'use client'
-import { Card, Space } from "antd"
+import { Button, Card, Space, Typography } from "antd"
 import { useEffect, useState } from "react"
 import ProviderDetails from "./providerDetails"
 import ProviderEarningDetails from "./providerEarningDetails"
@@ -7,6 +7,7 @@ import ChargerDetails from "./chargerDetails"
 import axios from "axios"
 import { getJwtToken } from "../utils"
 
+const { Title } = Typography
 const dummyData = {
     "company": "test company",
     "earnings": "$15000",
@@ -28,33 +29,64 @@ function Admin() {
                 Authentication: jwtToken?.toString()
             }
         })
-        setUser(data)
+        return data["id"]
     };
+
+    async function createProvider() {
+        const jwtToken = await getJwtToken();
+        console.log(jwtToken)
+        const { data } = await axios.post(providerUrl, {}, {
+            headers: {
+                Accept: 'application/json',
+                Authentication: jwtToken?.toString()
+            }
+        })
+        setUser(data)
+        console.log(data)
+    }
 
     useEffect(() => {
         // get provider by user
         getProviderDetails()
 
-        // if user is not admin jump out
-        return (
-            setIsLoading(false)
-        )
     }, [])
 
     useEffect(() => {
         console.log(user)
+        if (user != undefined) {
+            setIsLoading(false)
+        }
     }, user)
-    return (
-        <div>
 
-        </div>
-        // <Card loading={loading} title={user.company}>
-        //     <Space direction="vertical">
-        //         {user.role == "admin" ? <ProviderDetails user={user} /> : null}
-        //         <ProviderEarningDetails user={user} />
-        //         <ChargerDetails user={user} />
-        //     </Space>
-        // </Card>
+    function onClickCreateProvider() {
+        createProvider()
+    }
+
+    if (user == undefined) {
+        return (
+            <Card>
+                <Space direction="vertical" align="center">
+                    <Title>
+                        Not a provider? Be a provider with us!
+                    </Title>
+                    <Button onClick={createProvider}>
+                        Become a provider
+                    </Button>
+                </Space>
+            </Card>
+        )
+    }
+    return (
+        // <div>
+
+        // </div>
+        <Card loading={loading} title={user.company}>
+            <Space direction="vertical">
+                {user.role == "admin" ? <ProviderDetails user={user} /> : null}
+                <ProviderEarningDetails user={user} />
+                <ChargerDetails user={user} />
+            </Space>
+        </Card>
     )
 }
 
