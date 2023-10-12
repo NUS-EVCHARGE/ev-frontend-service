@@ -6,48 +6,62 @@ import { useRouter } from 'next/navigation';
 import axios, { AxiosRequestHeaders } from 'axios';
 import { getJwtToken } from '../utils';
 
-const billOption = ['outstanding', 'completed'];
-// const defaultBookingOption = 'upcoming booking'
+const billOption = ['outstanding', 'completed'];    
 
 function Bill() {
-    const [billList, setBillList] = useState<Booking[]>([])
+    type billInfosType = Record<string, UserPaymentItem[]>
+    const [billList, setBillList] = useState<billInfosType>()
     const [currentBillOption, setBillOptions] = useState('outstanding')
     const router = useRouter()
 
-    type Booking = {
+    type UserPaymentItem = {
         id: number,
         charger_id: number,
         Email: string,
         start_time: string,
         end_time: string,
         Status: string,
+        bookingId: number,
+        UserEmail: string,
+        paymentStatus: string
+    }
+
+    function getFilteredBillList() {
+        if (!billList) {
+            return []
+        }
+        if (currentBillOption == 'outstanding') {
+            const pendingList = billList['pending']
+            if (pendingList) {
+                return pendingList.filter((item) => item.paymentStatus == 'pending')
+            }
+        } else {
+            const pendingList = billList['completed']
+            if (pendingList) {
+                return pendingList.filter((item) => item.paymentStatus == 'completed')
+            }
+        }
     }
 
     useEffect(() => {
-        async function getAllBooking() {
+        async function getAllUserPayment() {
             const jwtToken = await getJwtToken()
             const headers: AxiosRequestHeaders = {
                 'Content-Type': 'application/json',
-              };
-              if (jwtToken) {
+            };
+            if (jwtToken) {
                 headers['Authentication'] = jwtToken;
-              }
-            axios.get(process.env.NEXT_PUBLIC_REACT_APP_BASE_URL + '/booking', {
+            }
+            axios.get(process.env.NEXT_PUBLIC_REACT_APP_BASE_URL + '/payment/user/getAllBooking', {
                 headers: headers
             }).then((res) => {
-                const data : Booking[] = res.data.filter((item: Booking) => {
-                    if (item.Status == "completed") {
-                        return {
-                            item
-                        }
-                    }
-                });
+                const data: billInfosType = res.data
                 setBillList(data);
             }).catch((err) => {
                 console.log(err);
             })
         }
-        getAllBooking()
+        getAllUserPayment()
     }, [])
 
     return (
@@ -72,15 +86,15 @@ function Bill() {
             </Space>
             <List
                 pagination={{ position: 'bottom', align: 'center' }}
-                dataSource={billList}
+                dataSource={getFilteredBillList()}
                 renderItem={(item, index) => (
                     <List.Item>
                         <List.Item.Meta
                             avatar={
                                 <Avatar src={`https://xsgames.co/randomusers/avatar.php?g=pixel&key=${index}`} />
                             }
-                            title={<a href="https://ant.design">Booking: {item.id} - Charger: {item.charger_id}</a>}
-                            description={`Start time: ${item.start_time} - End time: ${item.end_time}`}
+                            title={<a href="https://ant.design">Booking No: {item.id} - Charger point: {item.charger_id}</a>}
+                            description={`Start time: ${new Date(item.start_time).toLocaleString("en-SG")} - End time: ${new Date(item.end_time).toLocaleString("en-SG")}`}
                         />
                         {currentBillOption == "outstanding" ? <Button onClick={() => {
                             router.push("/bill/payment")
