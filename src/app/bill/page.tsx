@@ -17,10 +17,15 @@ function Bill() {
     type UserPaymentItem = {
         id: number,
         charger_id: number,
+        chargerAddress : string,
+        TotalBill: number,
+        FinalBill: number,
+        Coupon: string,
         Email: string,
         start_time: string,
         end_time: string,
         Status: string,
+        normalRate: number,
         bookingId: number,
         UserEmail: string,
         paymentStatus: string
@@ -93,8 +98,13 @@ function Bill() {
                             avatar={
                                 <Avatar src={`https://xsgames.co/randomusers/avatar.php?g=pixel&key=${index}`} />
                             }
-                            title={<a href="https://ant.design">Booking No: {item.id} - Charger point: {item.charger_id}</a>}
-                            description={`Start time: ${new Date(item.start_time).toLocaleString("en-SG")} - End time: ${new Date(item.end_time).toLocaleString("en-SG")}`}
+                            title={<a href="https://ant.design">Reference: {item.id}
+                            <br/> Total Bill: ${item.TotalBill}</a>}    
+                            description={
+                            <a>Start time: {new Date(item.start_time).toLocaleString("en-SG")} - End time: {new Date(item.end_time).toLocaleString("en-SG")}
+                            <br/>Location: {item.chargerAddress}
+                            </a>
+                            }
                         />
                         {currentBillOption == "outstanding" ? <Button onClick={() => {
                             router.push("/bill/payment")
