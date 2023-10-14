@@ -29,7 +29,8 @@ function Admin() {
                 Authentication: jwtToken?.toString()
             }
         })
-        return data["id"]
+        setUser(data)
+        // return data["id"]
     };
 
     async function createProvider() {
