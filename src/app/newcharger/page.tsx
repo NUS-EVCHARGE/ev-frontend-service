@@ -7,6 +7,7 @@ import { Input, Space, Button, Typography } from 'antd';
 const { Search } = Input;
 const { Paragraph } = Typography;
 const { Title } = Typography;
+import ScrollComponent from "./scrollComponent";
 
 export default function ChargerForm() {
     const [coordinates, setCoordinates] = useState({ lat: null, 
@@ -36,6 +37,7 @@ export default function ChargerForm() {
 
     return (
         <div>
+          <Title></Title>
           <Space direction="vertical">
             <Title level={2}>Add rates</Title>
             <Input placeholder="Normal Rate" style={{ width: 200 , padding: '5px'}} onChange={(e) => setRatesId(e.target.value)}/>
