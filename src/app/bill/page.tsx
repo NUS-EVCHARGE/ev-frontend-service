@@ -3,9 +3,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Avatar, Button, List, Radio, Space } from 'antd';
 import { useRouter } from 'next/navigation';
-import axios, { AxiosRequestHeaders } from 'axios';
+import axios from 'axios';
 import { getJwtToken } from '../utils';
-import { type } from 'os';
 
 const billOption = ['outstanding', 'completed'];    
 
