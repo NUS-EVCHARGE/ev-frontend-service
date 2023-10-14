@@ -48,24 +48,25 @@ function Bill() {
         }
     }
 
-    async function getAllUserPayment() {
-        const jwtToken = await getJwtToken()
-        axios.get(process.env.NEXT_PUBLIC_REACT_APP_BASE_URL + '/payment/user/getAllBooking', {
-            headers: {
-                Accept: 'application/json',
-                Authentication: jwtToken?.toString()
-            }
-        }).then((res) => {
-            const data: billInfosType = res.data
-            setBillList(data);
-        }).catch((err) => {
-            console.log(err);
-        })
-    }
-
     useEffect(() => {
+
+        async function getAllUserPayment() {
+            const jwtToken = await getJwtToken()
+            axios.get(process.env.NEXT_PUBLIC_REACT_APP_BASE_URL + '/payment/user/getAllBooking', {
+                headers: {
+                    Accept: 'application/json',
+                    Authentication: jwtToken?.toString()
+                }
+            }).then((res) => {
+                const data: billInfosType = res.data
+                setBillList(data);
+            }).catch((err) => {
+                console.log(err);
+            })
+        }
+
         getAllUserPayment()
-    })
+    },[]);
 
     return (
         <>
