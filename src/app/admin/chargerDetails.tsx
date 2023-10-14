@@ -1,7 +1,7 @@
 'use client'
 import { Card, Button, List, Avatar } from "antd"
 import { useRouter } from 'next/navigation';
-
+import ChargerTable from "./chargerTable";
 function ChargerDetails({ user }: any) {
 
     const router = useRouter();
@@ -12,41 +12,65 @@ function ChargerDetails({ user }: any) {
 
     const data = [
         {
-            title: 'Ant Design Title 1',
+            chargerId: '1',
+            address: '1234 Main St',
+            normalRate: '1.00',
+            penaltyRate: '2.00',
+            noShowRate: '3.00',
+            status: 'Active',
         },
         {
-            title: 'Ant Design Title 2',
+            chargerId: '2',
+            address: '1234 Main St',
+            normalRate: '1.00',
+            penaltyRate: '2.00',
+            noShowRate: '3.00',
+            status: 'Active',
         },
         {
-            title: 'Ant Design Title 3',
-        },
-        {
-            title: 'Ant Design Title 4',
+            chargerId: '3',
+            address: '1234 Main St',
+            normalRate: '1.00',
+            penaltyRate: '2.00',
+            noShowRate: '3.00',
+            status: 'Active',
         },
     ];
     return (
         <Card type="inner" title="Chargers" extra={<Button onClick={navigateToAddChargerPage}>
             Add Charger
         </Button>}>
-
-            <List
+            <ChargerTable />
+            {/* <List
                 pagination={{ position: 'bottom', align: 'center' }}
                 dataSource={data}
                 renderItem={(item, index) => (
                     <List.Item>
                         <List.Item.Meta
-                            avatar={
-                                <Avatar src={`https://xsgames.co/randomusers/avatar.php?g=pixel&key=${index}`} />
+                            // avatar={
+                            //     <Avatar src={`https://xsgames.co/randomusers/avatar.php?g=pixel&key=${index}`} />
+                            // }
+                            title={<a href="https://ant.design">{"Charger ID: "+item.chargerId}</a>}
+                            // address={item.address}
+                            // normalRate={item.normalRate}
+                            // penaltyRate={item.penaltyRate}
+                            // noShowRate={item.noShowRate}
+                            // status={item.status}
+
+                            description={
+                                "Location: "+ item.address+' |\n'+
+                                "Normal Rate: "+ item.normalRate+' |\n'+
+                                "Penalty Rate: "+ item.penaltyRate+' |\n'+
+                                "No Show Rate: "+ item.noShowRate+' |\n'+
+                                "Status: "+ item.status+' |\n'
                             }
-                            title={<a href="https://ant.design">{item.title}</a>}
-                            description="Ant Design, a design language for background applications, is refined by Ant UED Team"
                         />
                         <Button>
                             Details
                         </Button>
                     </List.Item>
                 )}
-            />
+            /> */}
 
         </Card>
     )
