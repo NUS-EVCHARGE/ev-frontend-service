@@ -5,31 +5,32 @@ import { Avatar, Button, List, Radio, Space } from 'antd';
 import { useRouter } from 'next/navigation';
 import axios, { AxiosRequestHeaders } from 'axios';
 import { getJwtToken } from '../utils';
+import { type } from 'os';
 
 const billOption = ['outstanding', 'completed'];    
+
+type UserPaymentItem = {
+    id: number,
+    charger_id: number,
+    chargerAddress : string,
+    TotalBill: number,
+    FinalBill: number,
+    Coupon: string,
+    Email: string,
+    start_time: string,
+    end_time: string,
+    Status: string,
+    normalRate: number,
+    bookingId: number,
+    UserEmail: string,
+    paymentStatus: string
+}
 
 function Bill() {
     type billInfosType = Record<string, UserPaymentItem[]>
     const [billList, setBillList] = useState<billInfosType>()
     const [currentBillOption, setBillOptions] = useState('outstanding')
     const router = useRouter()
-
-    type UserPaymentItem = {
-        id: number,
-        charger_id: number,
-        chargerAddress : string,
-        TotalBill: number,
-        FinalBill: number,
-        Coupon: string,
-        Email: string,
-        start_time: string,
-        end_time: string,
-        Status: string,
-        normalRate: number,
-        bookingId: number,
-        UserEmail: string,
-        paymentStatus: string
-    }
 
     function getFilteredBillList() {
         if (!billList) {
@@ -119,3 +120,4 @@ function Bill() {
     );
 }
 export default Bill
+export type { UserPaymentItem }

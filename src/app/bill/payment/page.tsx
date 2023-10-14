@@ -1,39 +1,48 @@
 'use client'
 import React, { useState, useEffect } from "react";
-import { loadStripe } from "@stripe/stripe-js";
+import { loadStripe, StripeElementsOptions } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
-
 import CheckoutForm from "./checkout";
+import axios from "axios";
+import { getJwtToken } from "../../utils";
 
 // Make sure to call loadStripe outside of a component’s render to avoid
 // recreating the Stripe object on every render.
-// This is a public sample test API key.
-// Don’t submit any personally identifiable information in requests made with this key.
-// Sign in to see your own test API key embedded in code samples.
-const stripePromise = loadStripe("pk_test_GvF3BSyx8RSXMK5yAFhqEd3H");
-type Props = {
-    billId: Number;
-};
+// This is your test publishable API key.
+const stripePromise = loadStripe("pk_test_51NrNOGGLXzXpdEz5VdJ52FARjWR4JAe2Y8xiKXmAJQJe4ntELEngRXKknHT8FEYwyZSSYQcvkEcgwTU6P37Z88QN00EqzUnnaO");
 
-const Payment: React.FC<Props> = ({ billId }) => {
+interface PageProps {
+    params: { slug: string };
+    searchParams: { [key: string]: string | string[] | undefined };
+}
+
+const Payment = ({ params, searchParams }: PageProps ) => {
     const [clientSecret, setClientSecret] = useState("");
 
     useEffect(() => {
         // Create PaymentIntent as soon as the page loads
-        // todo: require backend intergration
-        fetch("/create-payment-intent", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ 'bill_id': billId }),
-        })
-            .then((res) => res.json())
-            .then((data) => setClientSecret(data.clientSecret));
+        async function getPaymentIntent() {
+            const jwtToken = await getJwtToken();
+            axios.post(process.env.NEXT_PUBLIC_REACT_APP_BASE_URL + '/payment/provider', {TotalBill: 123}, {
+                headers: {
+                    Accept: 'application/json',
+                    Authentication: jwtToken?.toString()
+                }   
+            }).then((res) => {
+                console.log(res)
+                setClientSecret(res.data.stripe)
+            }).catch((err) => {
+                console.log(err);
+            });
+        }
+
+        getPaymentIntent();
     }, []);
 
     const appearance = {
-        theme: 'stripe',
+        theme: 'stripe' as const,
     };
-    const options = {
+    const options: StripeElementsOptions = {
         clientSecret,
         appearance,
     };
@@ -47,4 +56,6 @@ const Payment: React.FC<Props> = ({ billId }) => {
             )}
         </div>
     );
-}
+};
+
+export default Payment;
