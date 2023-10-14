@@ -48,26 +48,24 @@ function Bill() {
         }
     }
 
-    useEffect(() => {
-        async function getAllUserPayment() {
-            const jwtToken = await getJwtToken()
-            const headers: AxiosRequestHeaders = {
-                'Content-Type': 'application/json',
-            };
-            if (jwtToken) {
-                headers['Authentication'] = jwtToken;
+    async function getAllUserPayment() {
+        const jwtToken = await getJwtToken()
+        axios.get(process.env.NEXT_PUBLIC_REACT_APP_BASE_URL + '/payment/user/getAllBooking', {
+            headers: {
+                Accept: 'application/json',
+                Authentication: jwtToken?.toString()
             }
-            axios.get(process.env.NEXT_PUBLIC_REACT_APP_BASE_URL + '/payment/user/getAllBooking', {
-                headers: headers
-            }).then((res) => {
-                const data: billInfosType = res.data
-                setBillList(data);
-            }).catch((err) => {
-                console.log(err);
-            })
-        }
+        }).then((res) => {
+            const data: billInfosType = res.data
+            setBillList(data);
+        }).catch((err) => {
+            console.log(err);
+        })
+    }
+
+    useEffect(() => {
         getAllUserPayment()
-    }, [])
+    })
 
     return (
         <>
@@ -98,7 +96,7 @@ function Bill() {
                             avatar={
                                 <Avatar src={`https://xsgames.co/randomusers/avatar.php?g=pixel&key=${index}`} />
                             }
-                            title={<a href="https://ant.design">Reference: {item.id}
+                            title={<a href="https://ant.design">Bookng Number: {item.id}
                             <br/> Total Bill: ${item.TotalBill}</a>}    
                             description={
                             <a>Start time: {new Date(item.start_time).toLocaleString("en-SG")} - End time: {new Date(item.end_time).toLocaleString("en-SG")}
