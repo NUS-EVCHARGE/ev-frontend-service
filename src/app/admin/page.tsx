@@ -14,10 +14,16 @@ const dummyData = {
     "email": "test@test.com",
     "role": "admin"
 }
+type User = {
+    user_email: string,
+    company_name: string,
+    description: string,
+    status: string
+}
 
 function Admin() {
     const [loading, setIsLoading] = useState(true)
-    const [user, setUser] = useState()
+    const [user, setUser] = useState<User>()
     const providerUrl = String(process.env.NEXT_PUBLIC_REACT_APP_BASE_URL) + "/provider"
 
     async function getProviderDetails() {
@@ -57,7 +63,7 @@ function Admin() {
         if (user != undefined) {
             setIsLoading(false)
         }
-    }, user)
+    }, [user])
 
     function onClickCreateProvider() {
         createProvider()
@@ -78,12 +84,9 @@ function Admin() {
         )
     }
     return (
-        // <div>
-
-        // </div>
-        <Card loading={loading} title={user.company}>
+        <Card loading={loading} title={user.company_name}>
             <Space direction="vertical">
-                {user.role == "admin" ? <ProviderDetails user={user} /> : null}
+                {user != undefined ? <ProviderDetails user={user} /> : null}
                 <ProviderEarningDetails user={user} />
                 <ChargerDetails user={user} />
             </Space>
