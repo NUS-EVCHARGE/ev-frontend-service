@@ -37,42 +37,9 @@ function ChargerDetails({ user }: any) {
         },
     ];
     return (
-        <Card type="inner" title="Chargers" extra={<Button onClick={navigateToAddChargerPage}>
-            Add Charger
-        </Button>}>
+        <div>
             <ChargerTable />
-            {/* <List
-                pagination={{ position: 'bottom', align: 'center' }}
-                dataSource={data}
-                renderItem={(item, index) => (
-                    <List.Item>
-                        <List.Item.Meta
-                            // avatar={
-                            //     <Avatar src={`https://xsgames.co/randomusers/avatar.php?g=pixel&key=${index}`} />
-                            // }
-                            title={<a href="https://ant.design">{"Charger ID: "+item.chargerId}</a>}
-                            // address={item.address}
-                            // normalRate={item.normalRate}
-                            // penaltyRate={item.penaltyRate}
-                            // noShowRate={item.noShowRate}
-                            // status={item.status}
-
-                            description={
-                                "Location: "+ item.address+' |\n'+
-                                "Normal Rate: "+ item.normalRate+' |\n'+
-                                "Penalty Rate: "+ item.penaltyRate+' |\n'+
-                                "No Show Rate: "+ item.noShowRate+' |\n'+
-                                "Status: "+ item.status+' |\n'
-                            }
-                        />
-                        <Button>
-                            Details
-                        </Button>
-                    </List.Item>
-                )}
-            /> */}
-
-        </Card>
+        </div>
     )
 }
 
