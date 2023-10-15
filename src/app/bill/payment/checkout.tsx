@@ -1,11 +1,12 @@
 'use client'
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import {
     PaymentElement,
     LinkAuthenticationElement,
     useStripe,
     useElements
 } from "@stripe/react-stripe-js";
+import { usePathname } from "next/navigation";
 
 export default function CheckoutForm() {
     const stripe = useStripe();
@@ -14,6 +15,8 @@ export default function CheckoutForm() {
     const [email, setEmail] = useState('');
     const [message, setMessage] = useState<string>();
     const [isLoading, setIsLoading] = useState(false);
+
+    const path = usePathname();
 
     useEffect(() => {
         if (!stripe) {
@@ -61,7 +64,7 @@ export default function CheckoutForm() {
             elements,
             confirmParams: {
                 // Make sure to change this to your payment completion page
-                return_url: "http://localhost:3000",
+                return_url: `${path}/bill/payment/complete`,
             },
         });
 
@@ -91,7 +94,7 @@ export default function CheckoutForm() {
                 onChange={(e) => setEmail(e.value.email)}
             />
             <PaymentElement id="payment-element" />
-            <button disabled={isLoading || !stripe || !elements} id="submit">
+            <button disabled={false} id="submit">
                 <span id="button-text">
                     {isLoading ? <div className="spinner" id="spinner"></div> : "Pay now"}
                 </span>

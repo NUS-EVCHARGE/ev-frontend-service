@@ -5,6 +5,8 @@ import { Elements } from "@stripe/react-stripe-js";
 import CheckoutForm from "./checkout";
 import axios from "axios";
 import { getJwtToken } from "../../utils";
+import { UserPaymentItem } from "../page";
+import Item from "antd/es/list/Item";
 
 // Make sure to call loadStripe outside of a component’s render to avoid
 // recreating the Stripe object on every render.
@@ -18,12 +20,36 @@ interface PageProps {
 
 const Payment = ({ params, searchParams }: PageProps ) => {
     const [clientSecret, setClientSecret] = useState("");
-
+    const booking: number = typeof searchParams['bookingId'] === 'string' ? parseInt(searchParams['bookingId']) : 0;
     useEffect(() => {
+
+        async function getAllUserPayment() {
+            const jwtToken = await getJwtToken()
+            axios.get(process.env.NEXT_PUBLIC_REACT_APP_BASE_URL + '/payment/user/getAllBooking', {
+                headers: {
+                    Accept: 'application/json',
+                    Authentication: jwtToken?.toString()
+                }
+            }).then((res) => {
+                const data = res.data['pending'] as UserPaymentItem[];
+                console.log(data);
+                const filteredData = data.filter((item) => item.bookingId == booking)
+                console.log(filteredData);
+                console.log(booking);
+                if (filteredData.length > 0) {
+                    getPaymentIntent(filteredData[0])
+                } else {
+                    console.log('No booking found')
+                }
+            }).catch((err) => {
+                console.log(err);
+            })
+        }
+
         // Create PaymentIntent as soon as the page loads
-        async function getPaymentIntent() {
+        async function getPaymentIntent(item: UserPaymentItem) {
             const jwtToken = await getJwtToken();
-            axios.post(process.env.NEXT_PUBLIC_REACT_APP_BASE_URL + '/payment/provider', {TotalBill: 123}, {
+            axios.post(process.env.NEXT_PUBLIC_REACT_APP_BASE_URL + '/payment/provider', item, {
                 headers: {
                     Accept: 'application/json',
                     Authentication: jwtToken?.toString()
@@ -36,7 +62,8 @@ const Payment = ({ params, searchParams }: PageProps ) => {
             });
         }
 
-        getPaymentIntent();
+        getAllUserPayment();
+
     }, []);
 
     const appearance = {
