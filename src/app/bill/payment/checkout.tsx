@@ -1,11 +1,13 @@
 'use client'
 import React, { useEffect, useState } from "react";
+import { Button } from 'antd';
 import {
     PaymentElement,
     LinkAuthenticationElement,
     useStripe,
     useElements
 } from "@stripe/react-stripe-js";
+import { usePathname } from "next/navigation";
 
 export default function CheckoutForm() {
     const stripe = useStripe();
@@ -14,6 +16,8 @@ export default function CheckoutForm() {
     const [email, setEmail] = useState('');
     const [message, setMessage] = useState<string>();
     const [isLoading, setIsLoading] = useState(false);
+
+    const path = usePathname();
 
     useEffect(() => {
         if (!stripe) {
@@ -56,12 +60,15 @@ export default function CheckoutForm() {
         }
 
         setIsLoading(true);
+        const hostname = window.location.host;
 
         const { error } = await stripe.confirmPayment({
             elements,
             confirmParams: {
                 // Make sure to change this to your payment completion page
-                return_url: "http://localhost:3000",
+                return_url: `http://${hostname}/bill/complete`,
+                expand: ["test"],
+                receipt_email: email,
             },
         });
 
@@ -93,7 +100,7 @@ export default function CheckoutForm() {
             <PaymentElement id="payment-element" />
             <button disabled={isLoading || !stripe || !elements} id="submit">
                 <span id="button-text">
-                    {isLoading ? <div className="spinner" id="spinner"></div> : "Pay now"}
+                    {isLoading ? <div className="spinner" id="spinner"></div> : <Button style={{marginTop: 10}}>Pay now</Button>}
                 </span>
             </button>
             {/* Show any error or success messages */}
