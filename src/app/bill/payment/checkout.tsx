@@ -59,12 +59,14 @@ export default function CheckoutForm() {
         }
 
         setIsLoading(true);
+        const hostname = window.location.host;
 
         const { error } = await stripe.confirmPayment({
             elements,
             confirmParams: {
                 // Make sure to change this to your payment completion page
-                return_url: `${path}/bill/payment/complete`,
+                return_url: `http://${hostname}/bill/complete`,
+                // return_url: "http://localhost:3000/bill/payment/complete",
             },
         });
 
