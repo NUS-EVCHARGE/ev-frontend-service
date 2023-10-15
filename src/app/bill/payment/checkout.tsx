@@ -1,5 +1,6 @@
 'use client'
-import React, { use, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
+import { Button } from 'antd';
 import {
     PaymentElement,
     LinkAuthenticationElement,
@@ -66,7 +67,8 @@ export default function CheckoutForm() {
             confirmParams: {
                 // Make sure to change this to your payment completion page
                 return_url: `http://${hostname}/bill/complete`,
-                // return_url: "http://localhost:3000/bill/payment/complete",
+                expand: ["test"],
+                receipt_email: email,
             },
         });
 
@@ -98,7 +100,7 @@ export default function CheckoutForm() {
             <PaymentElement id="payment-element" />
             <button disabled={false} id="submit">
                 <span id="button-text">
-                    {isLoading ? <div className="spinner" id="spinner"></div> : "Pay now"}
+                    {isLoading ? <div className="spinner" id="spinner"></div> : <Button style={{marginTop: 10}}>Pay now</Button>}
                 </span>
             </button>
             {/* Show any error or success messages */}

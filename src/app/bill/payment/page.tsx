@@ -6,7 +6,6 @@ import CheckoutForm from "./checkout";
 import axios from "axios";
 import { getJwtToken } from "../../utils";
 import { UserPaymentItem } from "../page";
-import Item from "antd/es/list/Item";
 
 // Make sure to call loadStripe outside of a component’s render to avoid
 // recreating the Stripe object on every render.
