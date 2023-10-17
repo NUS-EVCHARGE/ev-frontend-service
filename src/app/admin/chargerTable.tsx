@@ -97,45 +97,13 @@ const EditableCell: React.FC<EditableCellProps> = ({
 };
 
 function ChargersList() {
-  // const [chargers, setChargers] = useState<RatesType[]>();
+  
   const [count, setCount] = useState(2);
   const [rates, setRates] = useState<RatesType[]>();
   const [editingKey, setEditingKey] = useState('');
   const [form] = Form.useForm();
-  
-
-
+  const [dataSource, setDataSource] = useState<RatesType[]>([]);
   const isEditing = (record: RatesType) => record.key === editingKey;
-  const [dataSource, setDataSource] = useState<RatesType[]>([
-    // {
-    //   key: '1',
-    //   chargerId: '1',
-    //   address: 'New York No. 1 Lake Park',
-    //   normalRate: 1.00,
-    //   penaltyRate: 2.00,
-    //   noShowRate: 3.00,
-    //   status: 'active',
-    // },
-    // {
-    //     key: '2',
-    //     chargerId: '2',
-    //     address: 'London No. 1 Lake Park',
-    //     normalRate: 1.00,
-    //     penaltyRate: 2.00,
-    //     noShowRate: 3.00,
-    //     status: 'active',
-    // },
-    // {
-    //     key: '3',
-    //     chargerId: '3',
-    //     address: 'Sydney No. 1 Lake Park',
-    //     normalRate: 1.00,
-    //     penaltyRate: 2.00,
-    //     noShowRate: 3.00,
-    //     status: 'inactive',
-    // },
-  ]
-  );
 
   const edit = (record: Partial<RatesType> & { key: React.Key }) => {
     form.setFieldsValue({ chargerId: '', age: '', address: '', ...record });
@@ -198,8 +166,8 @@ function ChargersList() {
   const columns = [
     {
       title: 'Charger ID',
-      dataIndex: 'chargerId',
-      key: 'chargerId',
+      dataIndex: 'key',
+      key: 'key',
       render: (text: string) => <a>{text}</a>,
     },
     {
@@ -275,14 +243,20 @@ function ChargersList() {
             <Typography.Link onClick={() => save(record.key)} style={{ marginRight: 8 }}>
               Save
             </Typography.Link>
-            <Popconfirm title="Sure to cancel?" onConfirm={cancel}>
+            <Popconfirm title="Sure to cancel?" okType={"default"} onConfirm={cancel}>
               <a>Cancel</a>
             </Popconfirm>
           </span>
         ) : (
-          <Typography.Link disabled={editingKey !== ''} onClick={() => edit(record)}>
-            Edit
-          </Typography.Link>
+          <Space>
+            <Typography.Link disabled={editingKey !== ''} onClick={() => edit(record)}>
+              Edit
+            </Typography.Link>
+            
+            <Popconfirm title="Sure to delete?" okType={"default"} onConfirm={() => handleDelete(record.key)}>
+              <Button type="link">Delete</Button>
+            </Popconfirm>
+        </Space>
         );
       },
     },
@@ -307,7 +281,7 @@ function ChargersList() {
     const newData: RatesType = {
       key: count,
       chargerId: `${count}`,
-      address: `London, Park Lane no. ${count}`,
+      address: '',
       normalRate: 0.0,
       penaltyRate: 0.0,
       noShowRate: 0.0,
@@ -315,11 +289,14 @@ function ChargersList() {
     };
     setDataSource([...dataSource, newData]);
     setCount(count + 1);
+    AddCharger();
   };
 
   const handleDelete = (key: React.Key) => {
+    console.log("record.key", key)
     const newData = dataSource.filter((item) => item.key !== key);
     setDataSource(newData);
+    DeleteCharger(key.toString());
   };
   
   // Get Charger details and rates for the provider
@@ -339,7 +316,7 @@ function ChargersList() {
 
     data.forEach((item: any) => {
       newArr.push({
-          key: '1',
+          key: item.id,
           chargerId: item.chargerId,
           address: item.address,
           normalRate: item.rates.normal_rate,
@@ -353,24 +330,67 @@ function ChargersList() {
     setDataSource(newArr);
     console.log("dataSource", dataSource)
   }
+  // Function to add the charger
+  async function AddCharger() {
+    const addChargerUrl = String(process.env.NEXT_PUBLIC_REACT_APP_BASE_URL) + "provider/1/rates"
+    const jwtToken = await getJwtToken();
+    console.log("changerUrl", addChargerUrl)
+    const { data } = await axios.post(addChargerUrl, {
+        headers: {
+            "Accept": 'application/json',
+            "authentication": jwtToken?.toString()
+        },
+        body: {
+          "id": 11,
+          "provider_id": 10,
+          "no_show_penalty_rate": 10,
+          "normal_rate": 10,
+          "penalty_rate": 10,
+          "status": "deactivated"
+        }
+    });
+    console.log("Add charger data", data)
+  }
+  // Function to delete the charger
+  async function DeleteCharger(chargerId: string) {
+    const deleteChargerUrl = String(process.env.NEXT_PUBLIC_REACT_APP_BASE_URL) + "provider/1/charger/" + chargerId
+    const jwtToken = await getJwtToken();
+    console.log("changerUrl", deleteChargerUrl)
+    const { data } = await axios.delete(deleteChargerUrl, {
+        headers: {
+            "Accept": 'application/json',
+            "authentication": jwtToken?.toString()
+        }
+    });
+    console.log("Delete charger data", data)
+  }
+
+  // Function to PATCH the charger
+  async function PatchCharger(chargerId: string) {
+    const patchChargerUrl = String(process.env.NEXT_PUBLIC_REACT_APP_BASE_URL) + "provider/1/charger/" + chargerId
+    const jwtToken = await getJwtToken();
+    console.log("changerUrl", patchChargerUrl)
+    const { data } = await axios.patch(patchChargerUrl, {
+        headers: {
+            "Accept": 'application/json',
+            "authentication": jwtToken?.toString()
+        }
+    });
+    console.log("Patch charger data", data)
+  }
+  
   const [top, setTop] = useState<TablePaginationPosition>('topCenter');
   const [bottom, setBottom] = useState<TablePaginationPosition>('bottomCenter');
-  const [loading, setIsLoading] = useState(true)
-    useEffect(() => {
-      // Get chargers for the first time
-      console.log('useEffect 1')
-      GetChargers();
-    }, []);
-  //   useEffect(() => {
-  //     if (chargers != undefined) {
-  //         setIsLoading(false)
-  //         GetChargers();
-  //     }
-  // }, chargers)
     // useEffect(() => {
     //   // Get chargers for the first time
+    //   console.log('useEffect - Get chargers for the first time')
     //   GetChargers();
-    // }, chargers);
+    // }, []);
+    useEffect(() => {
+      // Runs anytime dataSource changes
+      console.log('useEffect - Runs when dependency changes')
+      GetChargers();
+    }, dataSource);
 
     const mergedColumns = columns.map((col) => {
       if (!col.editable) {
