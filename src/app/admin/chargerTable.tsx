@@ -97,7 +97,7 @@ const EditableCell: React.FC<EditableCellProps> = ({
 };
 
 function ChargersList() {
-  const [chargers, setChargers] = useState<RatesType[]>();
+  // const [chargers, setChargers] = useState<RatesType[]>();
   const [count, setCount] = useState(2);
   const [rates, setRates] = useState<RatesType[]>();
   const [editingKey, setEditingKey] = useState('');
@@ -107,38 +107,37 @@ function ChargersList() {
 
   const isEditing = (record: RatesType) => record.key === editingKey;
   const [dataSource, setDataSource] = useState<RatesType[]>([
-    {
-      key: '1',
-      chargerId: '1',
-      address: 'New York No. 1 Lake Park',
-      normalRate: 1.00,
-      penaltyRate: 2.00,
-      noShowRate: 3.00,
-      status: 'active',
-    },
-    {
-        key: '2',
-        chargerId: '2',
-        address: 'London No. 1 Lake Park',
-        normalRate: 1.00,
-        penaltyRate: 2.00,
-        noShowRate: 3.00,
-        status: 'active',
-    },
-    {
-        key: '3',
-        chargerId: '3',
-        address: 'Sydney No. 1 Lake Park',
-        normalRate: 1.00,
-        penaltyRate: 2.00,
-        noShowRate: 3.00,
-        status: 'inactive',
-    },]
+    // {
+    //   key: '1',
+    //   chargerId: '1',
+    //   address: 'New York No. 1 Lake Park',
+    //   normalRate: 1.00,
+    //   penaltyRate: 2.00,
+    //   noShowRate: 3.00,
+    //   status: 'active',
+    // },
+    // {
+    //     key: '2',
+    //     chargerId: '2',
+    //     address: 'London No. 1 Lake Park',
+    //     normalRate: 1.00,
+    //     penaltyRate: 2.00,
+    //     noShowRate: 3.00,
+    //     status: 'active',
+    // },
+    // {
+    //     key: '3',
+    //     chargerId: '3',
+    //     address: 'Sydney No. 1 Lake Park',
+    //     normalRate: 1.00,
+    //     penaltyRate: 2.00,
+    //     noShowRate: 3.00,
+    //     status: 'inactive',
+    // },
+  ]
   );
 
   const edit = (record: Partial<RatesType> & { key: React.Key }) => {
-    console.log('EDIT TEST', record)
-    console.log('EDIT TEST')
     form.setFieldsValue({ chargerId: '', age: '', address: '', ...record });
     setEditingKey(record.key);
   };
@@ -303,7 +302,6 @@ function ChargersList() {
       //       </div>
       //     ) : null,
       // },
-  
   ];
   const handleAdd = () => {
     const newData: RatesType = {
@@ -314,7 +312,6 @@ function ChargersList() {
       penaltyRate: 0.0,
       noShowRate: 0.0,
       status: 'Active',
-      
     };
     setDataSource([...dataSource, newData]);
     setCount(count + 1);
@@ -324,81 +321,63 @@ function ChargersList() {
     const newData = dataSource.filter((item) => item.key !== key);
     setDataSource(newData);
   };
-
   
-  // Get Charger details for provider
+  // Get Charger details and rates for the provider
   async function GetChargers() {
-    const chargerUrl = String(process.env.NEXT_PUBLIC_REACT_APP_BASE_URL) + "provider/1/charger"
+    const chargerRaterUrl = String(process.env.NEXT_PUBLIC_REACT_APP_BASE_URL) + "provider/1/chargerandrate"
     const jwtToken = await getJwtToken();
-    console.log("changerUrl", chargerUrl)
-    const {data} = await axios.get(chargerUrl, {
+    console.log("changerUrl", chargerRaterUrl)
+    const { data } = await axios.get(chargerRaterUrl, {
         headers: {
             "Accept": 'application/json',
             "authentication": jwtToken?.toString()
         }
     });
-    console.log("get chargers data", data)
     
-    // Array to store the charger details and rates
+    // console.log("get chargers data", data)
     var newArr: DataType[] = [];
-    // Loop through the chargers to add into RatesType array
+
     data.forEach((item: any) => {
-        
-      async function GetRates(id: number) {
-        const {data} = await axios.get(String(process.env.NEXT_PUBLIC_REACT_APP_BASE_URL) + "provider/1/rates",{
-            headers: {
-                "Accept": 'application/json',
-                "authentication": jwtToken?.toString()
-            }
-        });
-        // console.log("get rates data", data)
-        // const found = data.found((item: any) => id ==item.id)
-        // setRates(found); 
-        // return found;
-        console.log("TK1")
-        // console.log("data[id]", Object.keys(0))
-        // return data[id];
-        // setRates(data);
-        return rates;
-      }
-        // Add the charger details to the array
-        console.log("item.rates_id", item.rates_id)
-        // let rates = GetRates(item.rates_id)
-        
-        console.log("GET rates", rates)
-        newArr.push({
+      newArr.push({
           key: '1',
           chargerId: item.chargerId,
           address: item.address,
-          normalRate: rates.normal_rate,
-          penaltyRate: rates.penalty_rate,
-          noShowRate: rates.no_show_penalty_rate,
+          normalRate: item.rates.normal_rate,
+          penaltyRate: item.rates.penalty_rate,
+          noShowRate: item.rates.no_show_penalty_rate,
           status: 'active',
         });
-    })
-    // const data : DataType[] = newArr;
-    const chargerList = GetChargers()
-    return newArr;
-    // setChargers(newArr);
+    });
+    console.log("newArr", newArr)
+    
+    setDataSource(newArr);
+    console.log("dataSource", dataSource)
   }
   const [top, setTop] = useState<TablePaginationPosition>('topCenter');
   const [bottom, setBottom] = useState<TablePaginationPosition>('bottomCenter');
+  const [loading, setIsLoading] = useState(true)
     useEffect(() => {
       // Get chargers for the first time
+      console.log('useEffect 1')
       GetChargers();
     }, []);
-    useEffect(() => {
-      // Get chargers for the first time
-      GetChargers();
-    }, chargers);
+  //   useEffect(() => {
+  //     if (chargers != undefined) {
+  //         setIsLoading(false)
+  //         GetChargers();
+  //     }
+  // }, chargers)
+    // useEffect(() => {
+    //   // Get chargers for the first time
+    //   GetChargers();
+    // }, chargers);
 
     const mergedColumns = columns.map((col) => {
       if (!col.editable) {
-        
         return col;
       }
-      console.log("col", col)
-      console.log("col.dataIndex", col.dataIndex)
+      // console.log("col", col)
+      // console.log("col.dataIndex", col.dataIndex)
       return {
         ...col,
         onCell: (record: RatesType) => ({
@@ -426,7 +405,8 @@ function ChargersList() {
         dataSource={dataSource}
         columns={mergedColumns} 
         rowClassName="editable-row"
-        pagination={{ onChange: cancel, 
+        pagination={{ 
+                      onChange: cancel, 
                       position: [bottom] 
                     }}  
                   />
