@@ -6,7 +6,7 @@ import CheckoutForm from "./checkout";
 import axios from "axios";
 import { getJwtToken } from "../../utils";
 import { UserPaymentItem } from "../page";
-
+import {useRouter} from "next/navigation";
 // Make sure to call loadStripe outside of a component’s render to avoid
 // recreating the Stripe object on every render.
 // This is your test publishable API key.
@@ -19,8 +19,12 @@ interface PageProps {
 
 const Payment = ({ params, searchParams }: PageProps ) => {
     const [clientSecret, setClientSecret] = useState("");
-    const booking: number = typeof searchParams['bookingId'] === 'string' ? parseInt(searchParams['bookingId']) : 0;
+    
     useEffect(() => {
+        console.log("------------------")
+        console.log(searchParams)
+        console.log("------------------")
+        const booking: number = typeof searchParams['bookingId'] === 'string' ? parseInt(searchParams['bookingId']) : 0;
 
         async function getAllUserPayment() {
             const jwtToken = await getJwtToken()
