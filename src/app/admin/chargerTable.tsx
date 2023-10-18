@@ -9,21 +9,12 @@ import jwt from 'jsonwebtoken';
 import { getJwtToken } from '../utils/index';
 import axios from 'axios';
 
-interface DataType {
-    key: string;
-    chargerId: string;
-    address: string;
-    normalRate: number,
-    penaltyRate: number,
-    noShowRate: number,
-    status: string,
-    // tags: string[];
-}
-
 interface RatesType {
-    key: React.Key,
+    key: React.Key, //number,
     chargerId: string,
     address: string,
+    lat: number,
+    lng: number,
     normalRate: number,
     penaltyRate: number,
     noShowRate: number,
@@ -101,14 +92,33 @@ function ChargersList() {
   const [count, setCount] = useState(2);
   const [rates, setRates] = useState<RatesType[]>();
   const [editingKey, setEditingKey] = useState('');
+  const [selectEdit, setSelectEdit] = useState(false);
   const [form] = Form.useForm();
   const [dataSource, setDataSource] = useState<RatesType[]>([]);
   const isEditing = (record: RatesType) => record.key === editingKey;
 
   const edit = (record: Partial<RatesType> & { key: React.Key }) => {
-    form.setFieldsValue({ chargerId: '', age: '', address: '', ...record });
+    form.setFieldsValue({ chargerId: '', provider_id: '', address: '', ...record });
     setEditingKey(record.key);
   };
+
+  useEffect(() => {
+    // Get chargers for the first time
+    // console.log('useEffect - Edit')
+    console.log('editingKey', editingKey)
+
+    // In edit mode
+    if (editingKey != '') {
+      // Code
+      editingKey
+      setSelectEdit(false);
+      // console.log('useEffect - Edit ENABLED')
+      // Update Select Component props disabled to false
+
+    } else { // Not in edit mode
+      setSelectEdit(true); 
+    }
+  }, [editingKey]);
 
   const cancel = () => {
     setEditingKey('');
@@ -154,9 +164,11 @@ function ChargersList() {
       icon: <UserOutlined />,
     },
   ];
+
   const handleChange = (value: string) => {
     console.log(`selected ${value}`);
   };
+
   const menuProps = {
     dropdownitems,
     onClick: handleMenuClick,
@@ -174,6 +186,18 @@ function ChargersList() {
       title: 'Address',
       dataIndex: 'address',
       key: 'address',
+      editable: true,
+    },
+    {
+      title: 'Latitude',
+      dataIndex: 'lat',
+      key: 'lat',
+      editable: true,
+    },
+    {
+      title: 'Longitude',
+      dataIndex: 'lng',
+      key: 'lng',
       editable: true,
     },
     {
@@ -210,26 +234,12 @@ function ChargersList() {
               color: status == 'active' ? 'green' : 'red',
             }}
             onChange={handleChange}
-            disabled={true}
+            disabled={selectEdit}
             options={[
               { value: 'active', label: 'Active' },
               { value: 'disabled', label: 'Disabled' },
             ]}
           />
-          {/* {(() => {
-              console.log("status", status);
-            if (status == 'active'){
-                return (
-                      <Tag color='green' key={status}>{status.toUpperCase()}</Tag>
-                )
-            }
-            else {
-                  return (
-                      <Tag color='red' key={status}>{status.toUpperCase()}</Tag>
-                  )
-            }
-            
-          })()} */}
         </span>
       ),
     },
@@ -253,10 +263,10 @@ function ChargersList() {
               Edit
             </Typography.Link>
             
-            <Popconfirm title="Sure to delete?" okType={"default"} onConfirm={() => handleDelete(record.key)}>
+            {/* <Popconfirm title="Sure to delete?" okType={"default"} onConfirm={() => handleDelete(record.key)}>
               <Button type="link">Delete</Button>
-            </Popconfirm>
-        </Space>
+            </Popconfirm> */}
+          </Space>
         );
       },
     },
@@ -278,10 +288,28 @@ function ChargersList() {
       // },
   ];
   const handleAdd = () => {
+    console.log('Add Charger - ')
+    // Get the last chargerId
+    console.log("dataSource", dataSource[dataSource.length-1].key)
+
+    // Get the last chargerId from the dataSource
+    const newChargerId = (dataSource: any) => {
+      // If there are no chargers, return 0
+      if (dataSource.length === 0) {
+        return 0;
+
+      } else { // If there are chargers, return the last chargerId + 1
+        return Number(dataSource[dataSource.length-1].key) + 1;
+      }
+      
+    }
+
     const newData: RatesType = {
-      key: count,
+      key: newChargerId(dataSource),
       chargerId: `${count}`,
       address: '',
+      lat: 0.0,
+      lng: 0.0,
       normalRate: 0.0,
       penaltyRate: 0.0,
       noShowRate: 0.0,
@@ -289,11 +317,11 @@ function ChargersList() {
     };
     setDataSource([...dataSource, newData]);
     setCount(count + 1);
-    AddCharger();
+    // AddCharger();
   };
 
   const handleDelete = (key: React.Key) => {
-    console.log("record.key", key)
+    // console.log("record.key", key)
     const newData = dataSource.filter((item) => item.key !== key);
     setDataSource(newData);
     DeleteCharger(key.toString());
@@ -303,7 +331,7 @@ function ChargersList() {
   async function GetChargers() {
     const chargerRaterUrl = String(process.env.NEXT_PUBLIC_REACT_APP_BASE_URL) + "provider/1/chargerandrate"
     const jwtToken = await getJwtToken();
-    console.log("changerUrl", chargerRaterUrl)
+    // console.log("changerUrl", chargerRaterUrl)
     const { data } = await axios.get(chargerRaterUrl, {
         headers: {
             "Accept": 'application/json',
@@ -312,34 +340,37 @@ function ChargersList() {
     });
     
     // console.log("get chargers data", data)
-    var newArr: DataType[] = [];
+    var newArr: RatesType[] = [];
+    // var newArr: DataType[] = [];
 
     data.forEach((item: any) => {
       newArr.push({
           key: item.id,
           chargerId: item.chargerId,
           address: item.address,
+          lat: item.lat,
+          lng: item.lng,
           normalRate: item.rates.normal_rate,
           penaltyRate: item.rates.penalty_rate,
           noShowRate: item.rates.no_show_penalty_rate,
           status: 'active',
         });
     });
-    console.log("newArr", newArr)
-    
     setDataSource(newArr);
-    console.log("dataSource", dataSource)
+    // console.log("newArr", newArr)
+    // console.log("dataSource", dataSource)
   }
   // Function to add the charger
   async function AddCharger() {
     const addChargerUrl = String(process.env.NEXT_PUBLIC_REACT_APP_BASE_URL) + "provider/1/rates"
     const jwtToken = await getJwtToken();
-    console.log("changerUrl", addChargerUrl)
+    // console.log("changerUrl", addChargerUrl)
     const { data } = await axios.post(addChargerUrl, {
         headers: {
             "Accept": 'application/json',
             "authentication": jwtToken?.toString()
         },
+        // TODO Test data - Integration not done
         body: {
           "id": 11,
           "provider_id": 10,
@@ -349,8 +380,9 @@ function ChargersList() {
           "status": "deactivated"
         }
     });
-    console.log("Add charger data", data)
-  }
+    // console.log("Add charger data", data)
+  };
+
   // Function to delete the charger
   async function DeleteCharger(chargerId: string) {
     const deleteChargerUrl = String(process.env.NEXT_PUBLIC_REACT_APP_BASE_URL) + "provider/1/charger/" + chargerId
@@ -362,33 +394,35 @@ function ChargersList() {
             "authentication": jwtToken?.toString()
         }
     });
-    console.log("Delete charger data", data)
-  }
+    // console.log("Delete charger data", data)
+  };
 
   // Function to PATCH the charger
   async function PatchCharger(chargerId: string) {
     const patchChargerUrl = String(process.env.NEXT_PUBLIC_REACT_APP_BASE_URL) + "provider/1/charger/" + chargerId
     const jwtToken = await getJwtToken();
-    console.log("changerUrl", patchChargerUrl)
+    // console.log("changerUrl", patchChargerUrl)
     const { data } = await axios.patch(patchChargerUrl, {
         headers: {
             "Accept": 'application/json',
             "authentication": jwtToken?.toString()
         }
     });
-    console.log("Patch charger data", data)
-  }
+    // console.log("Patch charger data", data)
+  };
   
   const [top, setTop] = useState<TablePaginationPosition>('topCenter');
   const [bottom, setBottom] = useState<TablePaginationPosition>('bottomCenter');
+
     // useEffect(() => {
     //   // Get chargers for the first time
     //   console.log('useEffect - Get chargers for the first time')
     //   GetChargers();
     // }, []);
+
     useEffect(() => {
       // Runs anytime dataSource changes
-      console.log('useEffect - Runs when dependency changes')
+      // console.log('useEffect - Runs when dependency changes')
       GetChargers();
     }, dataSource);
 
@@ -402,7 +436,7 @@ function ChargersList() {
         ...col,
         onCell: (record: RatesType) => ({
           record,
-          inputType: col.dataIndex === 'age' ? 'number' : 'text',
+          inputType: col.dataIndex === 'id' ? 'number' : 'text',
           dataIndex: col.dataIndex,
           title: col.title,
           editing: isEditing(record),
