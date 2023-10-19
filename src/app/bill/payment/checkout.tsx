@@ -98,11 +98,11 @@ export default function CheckoutForm() {
                 onChange={(e) => setEmail(e.value.email)}
             />
             <PaymentElement id="payment-element" />
-            <Button disabled={isLoading || !stripe || !elements} id="submit" style={{marginTop: 10}}>
+            <button disabled={isLoading || !stripe || !elements} id="submit">
                 <span id="button-text">
-                    {isLoading ? <div className="spinner" id="spinner"></div> : "Pay"}
+                    {isLoading ? <div className="spinner" id="spinner"></div> : <Button style={{marginTop: 10}}>Pay now</Button>}
                 </span>
-            </Button>
+            </button>
             {/* Show any error or success messages */}
             {message && <div id="payment-message">{message}</div>}
         </form>
