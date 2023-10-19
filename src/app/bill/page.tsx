@@ -2,7 +2,7 @@
 'use client'
 import React, { useEffect, useMemo, useState } from 'react';
 import { Avatar, Button, List, Radio, Space } from 'antd';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import axios from 'axios';
 import { getJwtToken } from '../utils';
 
@@ -31,7 +31,7 @@ function Bill() {
     const [currentBillOption, setBillOptions] = useState('outstanding')
     const router = useRouter()
     const params = useSearchParams()
-    const pathName = usePathname()
+    const pathName = window.location.pathname
 
     function getFilteredBillList() {
         if (!billList) {
@@ -110,7 +110,7 @@ function Bill() {
                         {currentBillOption == "outstanding" ? <Button onClick={() => {
                             const newParams = new URLSearchParams(params.toString());
                             newParams.set('bookingId', item.bookingId.toString());
-                            router.push(`${pathName}/payment?${newParams.toString()}`);
+                            router.push(`${pathName}payment?${newParams.toString()}`);
                         }}>
                             Pay
                         </Button> : <Button>
