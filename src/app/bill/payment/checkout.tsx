@@ -7,7 +7,6 @@ import {
     useStripe,
     useElements
 } from "@stripe/react-stripe-js";
-import { usePathname } from "next/navigation";
 
 export default function CheckoutForm() {
     const stripe = useStripe();
@@ -16,8 +15,6 @@ export default function CheckoutForm() {
     const [email, setEmail] = useState('');
     const [message, setMessage] = useState<string>();
     const [isLoading, setIsLoading] = useState(false);
-
-    const path = usePathname();
 
     useEffect(() => {
         if (!stripe) {
@@ -61,13 +58,14 @@ export default function CheckoutForm() {
 
         setIsLoading(true);
         const hostname = window.location.host;
+        const protocol = window.location.protocol;
+        const path = `${protocol}//${hostname}/bill/complete`
 
         const { error } = await stripe.confirmPayment({
             elements,
             confirmParams: {
                 // Make sure to change this to your payment completion page
-                return_url: `http://${hostname}/bill/complete`,
-                expand: ["test"],
+                return_url: path,
                 receipt_email: email,
             },
         });
