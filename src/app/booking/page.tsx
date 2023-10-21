@@ -3,6 +3,8 @@
 import React, { useEffect, useState } from 'react';
 import { Avatar, List, Radio, Space } from 'antd';
 import { get } from 'http';
+import axios from 'axios';
+import { getJwtToken } from '../utils';
 
 const data = [
     {
@@ -18,13 +20,34 @@ const data = [
         title: 'Ant Design Title 4',
     },
 ];
-
+// declare booking interfaces
 const bookingOptions = ['upcoming booking', 'past booking'];
-// const defaultBookingOption = 'upcoming booking'
+const bookingUrl = String(process.env.NEXT_PUBLIC_REACT_APP_BASE_URL) + "/booking"
 
 function Booking() {
     const [bookingList, setBookingList] = useState()
     const [bookingOption, setBookingOption] = useState('upcoming booking')
+
+    async function GetUserBooking() {
+        const jwtToken = await getJwtToken();
+        console.log(jwtToken)
+        if (bookingOption == 'upcoming booking') {
+            const { data } = await axios.get(bookingUrl, {
+                headers: {
+                    Accept: 'application/json',
+                    Authentication: jwtToken?.toString()
+                }
+            })
+            console.log(data)
+        }
+        // todo: set data to markers here
+        // setBookingList(data)
+    }
+
+    useEffect(() => {
+        GetUserBooking()
+    }, [])
+
 
     return (
         <>
