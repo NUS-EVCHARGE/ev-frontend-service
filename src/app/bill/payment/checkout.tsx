@@ -59,7 +59,10 @@ export default function CheckoutForm() {
         setIsLoading(true);
         const hostname = window.location.host;
         const protocol = window.location.protocol;
-        const path = `${protocol}//${hostname}/bill/complete`
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        const bookingId = urlParams.get('bookingId');
+        const path = `${protocol}//${hostname}/bill/complete/?bookingId=${bookingId}`
 
         const { error } = await stripe.confirmPayment({
             elements,
