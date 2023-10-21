@@ -175,8 +175,8 @@ function ChargersList({ user }: ChargerUserDetailsProps) {
       icon: <UserOutlined />,
     },
     {
-      label: 'Inactive',
-      key: 'inactive',
+      label: 'Disabled',
+      key: 'disabled',
       icon: <UserOutlined />,
     },
   ];
