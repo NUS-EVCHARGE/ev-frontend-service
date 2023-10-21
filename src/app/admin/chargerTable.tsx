@@ -111,11 +111,11 @@ function ChargersList({ user }: ChargerUserDetailsProps) {
   const [selectEdit, setSelectEdit] = useState(false);
   const [form] = Form.useForm();
   const [dataSource, setDataSource] = useState<RatesType[]>([]);
-  const isEditing = (record: RatesType) => record.key === editingKey;
+  const isEditing = (record: RatesType) => record.key === Number(editingKey);
 
-  const edit = (record: Partial<RatesType> & { key: React.Key }) => {
+  const edit = (record: Partial<RatesType> & { key: number }) => {
     form.setFieldsValue({ chargerId: '', provider_id: '', address: '', ...record });
-    setEditingKey(record.key);
+    setEditingKey(String(record.key));
   };
 
   useEffect(() => {
