@@ -2,7 +2,12 @@
 import { Card, Button, List, Avatar } from "antd"
 import { useRouter } from 'next/navigation';
 import ChargerTable from "./chargerTable";
-function ChargerDetails({ user }: any) {
+import { User } from "./page";
+
+interface ChargerUserDetailsProps {
+    user: User
+}
+function ChargerDetails({ user }: ChargerUserDetailsProps) {
 
     const router = useRouter();
 
@@ -38,9 +43,10 @@ function ChargerDetails({ user }: any) {
     ];
     return (
         <div>
-            <ChargerTable />
+            <ChargerTable user= {user}/>
         </div>
     )
 }
 
 export default ChargerDetails
+export type { ChargerUserDetailsProps }
