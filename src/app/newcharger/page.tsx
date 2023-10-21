@@ -7,7 +7,6 @@ import { Input, Space, Button, Typography } from 'antd';
 const { Search } = Input;
 const { Paragraph } = Typography;
 const { Title } = Typography;
-import ScrollComponent from "./scrollComponent";
 
 export default function ChargerForm() {
     const [coordinates, setCoordinates] = useState({ lat: null, 
