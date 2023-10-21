@@ -64,8 +64,8 @@ type ChargerRate = {
   id: number,
   provider_id: number,
   address: string,
-  lat: string,
-  lng: string,
+  lat: number,
+  lng: number,
   rates: Rates,
   status: string,
 }
@@ -175,8 +175,8 @@ function ChargersList({ user }: ChargerUserDetailsProps) {
       icon: <UserOutlined />,
     },
     {
-      label: 'Disabled',
-      key: 'disabled',
+      label: 'Inactive',
+      key: 'inactive',
       icon: <UserOutlined />,
     },
   ];
@@ -244,7 +244,7 @@ function ChargersList({ user }: ChargerUserDetailsProps) {
       render: (status: string) => (
         <span>
           <Select
-            defaultValue="disabled"
+            defaultValue="inactive"
             style={{ 
               width: 120,
               color: status == 'active' ? 'green' : 'red',
@@ -253,7 +253,7 @@ function ChargersList({ user }: ChargerUserDetailsProps) {
             disabled={selectEdit}
             options={[
               { value: 'active', label: 'Active' },
-              { value: 'disabled', label: 'Disabled' },
+              { value: 'inactive', label: 'Inactive' },
             ]}
           />
         </span>
@@ -281,30 +281,10 @@ function ChargersList({ user }: ChargerUserDetailsProps) {
             <Typography.Link disabled={editingKey !== ''} onClick={() => edit(record)}>
               Edit
             </Typography.Link>
-            
-            {/* <Popconfirm title="Sure to delete?" okType={"default"} onConfirm={() => handleDelete(record.key)}>
-              <Button type="link">Delete</Button>
-            </Popconfirm> */}
           </Space>
         );
       },
     },
-      // render: (_, record: { key: React.Key }) =>
-      //     dataSource.length >= 1 ? (
-      //       <div>
-      //         <div>
-      //           <Popconfirm title="Sure to edit?" onConfirm={() => handleDelete(record.key)}>
-      //             <a>Edit</a>
-      //           </Popconfirm>
-      //         </div>
-      //         <div>
-      //           <Popconfirm title="Sure to delete?" onConfirm={() => handleDelete(record.key)}>
-      //             <a>Delete</a>
-      //           </Popconfirm>
-      //         </div>
-      //       </div>
-      //     ) : null,
-      // },
   ];
 
   const handleAdd = () => {
@@ -318,7 +298,7 @@ function ChargersList({ user }: ChargerUserDetailsProps) {
       normalRate: "0",
       penaltyRate: "0",
       noShowRate: "0",
-      status: 'deactivated',
+      status: 'inactive',
     };
     AddCharger(newCharger);
   };
@@ -326,7 +306,9 @@ function ChargersList({ user }: ChargerUserDetailsProps) {
   const handlePatch = (newData: RatesType [], key: number) => {
     //Search for the row to be updated using the key
     const rowData = newData.filter((item) => item.key == key);
-    PatchCharger(rowData);
+    if (rowData.length > 0) {
+      PatchCharger(rowData[0]);
+    }
   }
 
   const handleDelete = (key: React.Key) => {
@@ -373,15 +355,15 @@ function ChargersList({ user }: ChargerUserDetailsProps) {
     await axios.post(chargerRateURL, {
           "provider_id": provderId,
           "address": newcharger.address,
-          "lat": newcharger.lat,
-          "lng": newcharger.lng,
-          "status": "inactive",
+          "lat": parseFloat(newcharger.lat),
+          "lng": parseFloat(newcharger.lng),
+          "status": newcharger.status,
           "rates": {
               "provider_id": provderId,
-              "normal_rate": newcharger.normalRate,
-              "penalty_rate": newcharger.penaltyRate,
-              "no_show_penalty_rate": newcharger.noShowRate,
-              "Status": "inactive"
+              "normal_rate": parseFloat(newcharger.normalRate),
+              "penalty_rate": parseFloat(newcharger.penaltyRate),
+              "no_show_penalty_rate": parseFloat(newcharger.noShowRate),
+              "Status": newcharger.status
           }
       }, {
         headers: {
@@ -395,8 +377,8 @@ function ChargersList({ user }: ChargerUserDetailsProps) {
         key: data.id,
         chargerId: data.id.toString(),
         address: data.address,
-        lat: data.lat,
-        lng: data.lng,
+        lat: String(data.lat),
+        lng: String(data.lng),
         rateId: data.rates.id,
         normalRate: String(data.rates.normal_rate),
         penaltyRate: String(data.rates.penalty_rate),
@@ -419,36 +401,36 @@ function ChargersList({ user }: ChargerUserDetailsProps) {
             "authentication": jwtToken?.toString()
         }
     });
-    // console.log("Delete charger data", data)
   };
 
   // Function to PATCH the charger
-  async function PatchCharger(charger: RatesType []) {
+  async function PatchCharger(charger: RatesType) {
     
     const jwtToken = await getJwtToken();
-    await axios.patch(chargerRateURL, {
-          "id": charger[0].key,
-          "provider_id": provderId,
-          "address": charger[0].address,
-          "lat": parseFloat(charger[0].lat),
-          "lng": parseFloat(charger[0].lng),
-          "status": charger[0].status,
-          "rates": {
-              "id": charger[0].rateId,
-              "provider_id": provderId,
-              "normal_rate": parseFloat(charger[0].normalRate),
-              "penalty_rate": parseFloat(charger[0].penaltyRate),
-              "no_show_penalty_rate": parseFloat(charger[0].noShowRate),
-              "Status": charger[0].status
-          }
-    }, {
+
+    const item : ChargerRate = {
+        id: charger.key,
+        provider_id: provderId,
+        address: charger.address,
+        lat: parseFloat(charger.lat),
+        lng: parseFloat(charger.lng),
+        status: charger.status,
+        rates: {
+            id: charger.rateId,
+            provider_id: provderId,
+            normal_rate: parseFloat(charger.normalRate),
+            penalty_rate: parseFloat(charger.penaltyRate),
+            no_show_penalty_rate: parseFloat(charger.noShowRate),
+            status: charger.status
+        },
+    }
+    await axios.patch(chargerRateURL, item , {
         headers: {
             "Accept": 'application/json',
             "authentication": jwtToken?.toString()
         }
     }).then((res) => {
       const data: ChargerRate = res.data
-      //GetChargers();
     }).catch((err) => {
       console.log(err);
     });
