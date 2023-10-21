@@ -15,13 +15,13 @@ type UserPaymentItem = {
     TotalBill: number,
     FinalBill: number,
     Coupon: string,
-    Email: string,
+    email: string,
     start_time: string,
     end_time: string,
     Status: string,
     normalRate: number,
     bookingId: number,
-    UserEmail: string,
+    userEmail: string,
     paymentStatus: string
 }
 
@@ -107,15 +107,23 @@ function Bill() {
                             </a>
                             }
                         />
-                        {currentBillOption == "outstanding" ? <Button onClick={() => {
+                        {
+                        currentBillOption == "outstanding" ? 
+                        <Button onClick={() => {    
                             const newParams = new URLSearchParams(params.toString());
                             newParams.set('bookingId', item.bookingId.toString());
                             router.push(`${pathName}payment?${newParams.toString()}`);
                         }}>
                             Pay
-                        </Button> : <Button>
+                        </Button> : 
+                        <Button onClick={() => {    
+                            const newParams = new URLSearchParams(params.toString());
+                            newParams.set('bookingId', item.bookingId.toString());
+                            router.push(`${pathName}receipt?${newParams.toString()}`);
+                        }}>
                             Receipt
-                        </Button>}
+                        </Button>
+                        }
                     </List.Item>
                 )}
             />
