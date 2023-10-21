@@ -11,12 +11,12 @@ interface RatesType {
     key: number, //number, React.Key,
     chargerId: string,
     address: string,
-    lat: number,
-    lng: number,
+    lat: string,
+    lng: string,
     rateId : number,
-    normalRate: number,
-    penaltyRate: number,
-    noShowRate: number,
+    normalRate: string,
+    penaltyRate: string,
+    noShowRate: string,
     status: string,
 }
 
@@ -64,8 +64,8 @@ type ChargerRate = {
   id: number,
   provider_id: number,
   address: string,
-  lat: number,
-  lng: number,
+  lat: string,
+  lng: string,
   rates: Rates,
   status: string,
 }
@@ -120,15 +120,11 @@ function ChargersList({ user }: ChargerUserDetailsProps) {
 
   useEffect(() => {
     // Get chargers for the first time
-    // console.log('useEffect - Edit')
-    console.log('editingKey', editingKey)
-
     // In edit mode
     if (editingKey != '') {
       // Code
       editingKey
       setSelectEdit(false);
-      // console.log('useEffect - Edit ENABLED')
       // Update Select Component props disabled to false
 
     } else { // Not in edit mode
@@ -140,13 +136,13 @@ function ChargersList({ user }: ChargerUserDetailsProps) {
     setEditingKey('');
   };
 
-  const save = async (key: React.Key) => {
+  const save = async (key: number) => {
     try {
       const row = (await form.validateFields()) as RatesType;
 
-      const newData = [...dataSource];
+      const newData = [...dataSource] as RatesType[];
       const index = newData.findIndex((item) => key === item.key);
-      console.log("index", newData)
+      
       if (index > -1) {
         const item = newData[index];
         newData.splice(index, 1, {
@@ -162,7 +158,7 @@ function ChargersList({ user }: ChargerUserDetailsProps) {
       }
 
       // Save the data
-      handlePatch(newData);
+      handlePatch(newData, key);
     } catch (errInfo) {
       console.log('Validate Failed:', errInfo);
     }
@@ -272,7 +268,6 @@ function ChargersList({ user }: ChargerUserDetailsProps) {
           <span>
             <Typography.Link onClick={() => {
               save(record.key)
-              console.log('record-1a', record)
               //handlePatch(record) //why record is not updated here?
             }} style={{ marginRight: 8 }}>
               Save
@@ -317,22 +312,21 @@ function ChargersList({ user }: ChargerUserDetailsProps) {
       key: 0,
       chargerId: "0",
       address: '',
-      lat: 0,
-      lng: 0,
+      lat: "0",
+      lng: "0",
       rateId: 0,
-      normalRate: 0,
-      penaltyRate: 0,
-      noShowRate: 0,
+      normalRate: "0",
+      penaltyRate: "0",
+      noShowRate: "0",
       status: 'deactivated',
     };
     AddCharger(newCharger);
   };
 
-  const handlePatch = (newData : RatesType) => {
-    // console.log("handlePatch-1", key)
-    // const newData = dataSource.filter((item) => item.key == key);
-    console.log("handlePatch-2", newData)
-    PatchCharger(newData);
+  const handlePatch = (newData: RatesType [], key: number) => {
+    //Search for the row to be updated using the key
+    const rowData = newData.filter((item) => item.key == key);
+    PatchCharger(rowData);
   }
 
   const handleDelete = (key: React.Key) => {
@@ -404,9 +398,9 @@ function ChargersList({ user }: ChargerUserDetailsProps) {
         lat: data.lat,
         lng: data.lng,
         rateId: data.rates.id,
-        normalRate: data.rates.normal_rate,
-        penaltyRate: data.rates.penalty_rate,
-        noShowRate: data.rates.no_show_penalty_rate,
+        normalRate: String(data.rates.normal_rate),
+        penaltyRate: String(data.rates.penalty_rate),
+        noShowRate: String(data.rates.no_show_penalty_rate),
         status: data.status,
       };
       setDataSource([...dataSource, newData]);
@@ -429,24 +423,23 @@ function ChargersList({ user }: ChargerUserDetailsProps) {
   };
 
   // Function to PATCH the charger
-  async function PatchCharger(charger: RatesType) {
-    console.log("PatchCharger-1", chargerRateURL)
-    console.log("PatchCharger-1", charger)
+  async function PatchCharger(charger: RatesType []) {
+    
     const jwtToken = await getJwtToken();
     await axios.patch(chargerRateURL, {
-          "id": charger.key,
+          "id": charger[0].key,
           "provider_id": provderId,
-          "address": charger.address,
-          "lat": charger.lat,
-          "lng": charger.lng,
-          "status": charger.status,
+          "address": charger[0].address,
+          "lat": parseFloat(charger[0].lat),
+          "lng": parseFloat(charger[0].lng),
+          "status": charger[0].status,
           "rates": {
-              "id": charger.rateId,
+              "id": charger[0].rateId,
               "provider_id": provderId,
-              "normal_rate": charger.normalRate,
-              "penalty_rate": charger.penaltyRate,
-              "no_show_penalty_rate": charger.noShowRate,
-              "Status": charger.status
+              "normal_rate": parseFloat(charger[0].normalRate),
+              "penalty_rate": parseFloat(charger[0].penaltyRate),
+              "no_show_penalty_rate": parseFloat(charger[0].noShowRate),
+              "Status": charger[0].status
           }
     }, {
         headers: {
