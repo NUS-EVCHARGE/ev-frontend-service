@@ -13,7 +13,7 @@ const { Title, Text } = Typography;
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_REACT_STRIPE_PUBLISABLE_API ?? "");
 
-export function PaymentCompletePage() {
+function PaymentCompletePage() {
 
   const stripe = useStripe();
   const [message, setMessage] = useState<string>();
