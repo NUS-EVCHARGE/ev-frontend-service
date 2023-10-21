@@ -8,7 +8,7 @@ import axios from 'axios';
 import { ChargerUserDetailsProps } from './chargerDetails';
 
 interface RatesType {
-    key: React.Key, //number,
+    key: number, //number, React.Key,
     chargerId: string,
     address: string,
     lat: number,
@@ -146,6 +146,7 @@ function ChargersList({ user }: ChargerUserDetailsProps) {
 
       const newData = [...dataSource];
       const index = newData.findIndex((item) => key === item.key);
+      console.log("index", newData)
       if (index > -1) {
         const item = newData[index];
         newData.splice(index, 1, {
@@ -159,6 +160,9 @@ function ChargersList({ user }: ChargerUserDetailsProps) {
         setDataSource(newData);
         setEditingKey('');
       }
+
+      // Save the data
+      handlePatch(newData);
     } catch (errInfo) {
       console.log('Validate Failed:', errInfo);
     }
@@ -268,7 +272,8 @@ function ChargersList({ user }: ChargerUserDetailsProps) {
           <span>
             <Typography.Link onClick={() => {
               save(record.key)
-              handlePatch(record.key) //why record is not updated here?
+              console.log('record-1a', record)
+              //handlePatch(record) //why record is not updated here?
             }} style={{ marginRight: 8 }}>
               Save
             </Typography.Link>
@@ -323,11 +328,11 @@ function ChargersList({ user }: ChargerUserDetailsProps) {
     AddCharger(newCharger);
   };
 
-  const handlePatch = (key : React.Key) => {
-    console.log("handlePatch", key)
-    const newData = dataSource.filter((item) => item.key == key);
-    console.log("handlePatch", newData)
-    PatchCharger(newData[0]);
+  const handlePatch = (newData : RatesType) => {
+    // console.log("handlePatch-1", key)
+    // const newData = dataSource.filter((item) => item.key == key);
+    console.log("handlePatch-2", newData)
+    PatchCharger(newData);
   }
 
   const handleDelete = (key: React.Key) => {
@@ -425,6 +430,8 @@ function ChargersList({ user }: ChargerUserDetailsProps) {
 
   // Function to PATCH the charger
   async function PatchCharger(charger: RatesType) {
+    console.log("PatchCharger-1", chargerRateURL)
+    console.log("PatchCharger-1", charger)
     const jwtToken = await getJwtToken();
     await axios.patch(chargerRateURL, {
           "id": charger.key,
