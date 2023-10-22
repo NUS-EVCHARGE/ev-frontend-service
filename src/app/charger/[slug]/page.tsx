@@ -1,6 +1,6 @@
 'use client'
 import { Button, Card, Col, Row } from 'antd'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/navigation'
 import { Dayjs } from 'dayjs';
 import React, { useEffect, useState } from 'react';
 import { Calendar, theme, Typography } from 'antd';
@@ -74,7 +74,7 @@ export default function ChargerBooking({ params }: { params: { slug: number } })
     const [selectedDate, setSelectedDate] = useState<Dayjs>()
     const [bookingList, setBookingList] = useState<Map<string, Booking>>(new Map());
     const { token } = theme.useToken();
-
+    const router = useRouter();
     useEffect(() => {
         GetAllBooking()
         setBookingList(stubBookingMap)
@@ -170,6 +170,7 @@ export default function ChargerBooking({ params }: { params: { slug: number } })
                 createBookingReq(bookingReq)
             }
         });
+        router.push("/booking")
     }
 
     return (
