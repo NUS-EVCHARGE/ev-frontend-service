@@ -115,7 +115,10 @@ export default function ChargerBooking({ params }: { params: { slug: number } })
     async function createBookingReq(bookingReq: CreateBookingReqObj) {
         const jwtToken = await getJwtToken();
         const { data } = await axios.post(bookingUrl, {
-            bookingReq
+                charger_id: bookingReq.charger_id,
+                start_time: new Date(bookingReq.start_time),
+                end_time: new Date(bookingReq.end_time),
+                Status: bookingReq.Status
         }, {
             headers: {
                 Accept: 'application/json',
