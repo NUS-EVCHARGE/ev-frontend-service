@@ -1,47 +1,21 @@
 'use client'
-import { useEffect, useState } from "react";
 import { Card, Button, List, Avatar } from "antd"
+import { useRouter } from 'next/navigation';
+import ChargerTable from "./chargerTable";
+import { User } from "./page";
 
-function ChargerDetails({ user }: any) {
-    const data = [
-        {
-            title: 'Ant Design Title 1',
-        },
-        {
-            title: 'Ant Design Title 2',
-        },
-        {
-            title: 'Ant Design Title 3',
-        },
-        {
-            title: 'Ant Design Title 4',
-        },
-    ];
+interface ChargerUserDetailsProps {
+    user: User
+}
+function ChargerDetails({ user }: ChargerUserDetailsProps) {
+
+
     return (
-        <Card type="inner" title="Chargers" extra={<Button>
-            Add Charger
-        </Button>}>
-            <List
-                pagination={{ position: 'bottom', align: 'center' }}
-                dataSource={data}
-                renderItem={(item, index) => (
-                    <List.Item>
-                        <List.Item.Meta
-                            avatar={
-                                <Avatar src={`https://xsgames.co/randomusers/avatar.php?g=pixel&key=${index}`} />
-                            }
-                            title={<a href="https://ant.design">{item.title}</a>}
-                            description="Ant Design, a design language for background applications, is refined by Ant UED Team"
-                        />
-                        <Button>
-                            Details
-                        </Button>
-                    </List.Item>
-                )}
-            />
-
-        </Card>
+        <div>
+            <ChargerTable user= {user}/>
+        </div>
     )
 }
 
 export default ChargerDetails
+export type { ChargerUserDetailsProps }

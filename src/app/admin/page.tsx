@@ -15,6 +15,7 @@ const dummyData = {
     "role": "admin"
 }
 type User = {
+    id: number,
     user_email: string,
     company_name: string,
     description: string,
@@ -36,7 +37,6 @@ function Admin() {
             }
         })
         setUser(data)
-        // return data["id"]
     };
 
     async function createProvider() {
@@ -95,5 +95,6 @@ function Admin() {
 }
 
 export default Admin
+export type { User }
 
 
