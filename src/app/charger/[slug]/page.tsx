@@ -28,6 +28,7 @@ export interface CreateBookingReqObj {
     charger_id: number
     start_time: string
     end_time: string
+    Status: string
 }
 
 export interface BookingResponseObj {
@@ -90,23 +91,23 @@ export default function ChargerBooking({ params }: { params: { slug: number } })
         console.log(data)
 
         for (let b of data) {
-            if (b.Status != 'completed') {
-                let setBooking = false
-                bookingList.forEach((booking, time) => {
+            let setBooking = false
+            console.log(b)
+            bookingList.forEach((booking, time) => {
 
-                    if (selectedDate != undefined && isDateMatch(selectedDate, b.start_time)) {
-                        setBooking = true
-                    }
+                if (selectedDate != undefined && isDateMatch(selectedDate, b.start_time)) {
+                    setBooking = true
+                }
 
-                    if (selectedDate != undefined && isDateMatch(selectedDate, b.endTime)) {
-                        setBooking = false
-                    }
-
-                    booking.status = setBooking
-                    bookingList.set(time, booking)
-                })
-                setBookingList(bookingList)
-            }
+                if (selectedDate != undefined && isDateMatch(selectedDate, b.endTime)) {
+                    setBooking = false
+                }
+                console.log(setBooking)
+                booking.status = setBooking
+                bookingList.set(time, booking)
+                // setBookingList(bookingList)
+            })
+            // setBookingList(bookingList)
         }
         // get booking 
     }
@@ -156,10 +157,12 @@ export default function ChargerBooking({ params }: { params: { slug: number } })
                 endTime = generateFullTime(selectedDate, time)
                 isBooking = false
                 let bookingReq: CreateBookingReqObj = {
-                    charger_id: params.slug,
+                    charger_id: +params.slug,
                     start_time: startTime,
-                    end_time: endTime
+                    end_time: endTime,
+                    Status: "waiting"
                 }
+                console.log(bookingReq)
                 // todo set loading function
                 createBookingReq(bookingReq)
             }

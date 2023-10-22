@@ -18,7 +18,6 @@ function App() {
   const [chargingStationList, setChargingStationList] = useState<ChargingStationArray>([]);
   async function GetAllCharger() {
     const jwtToken = await getJwtToken();
-    console.log(jwtToken)
     const { data } = await axios.get(chargerUrl, {
       headers: {
         Accept: 'application/json',
@@ -27,10 +26,13 @@ function App() {
     })
     console.log(data)
     // todo: set data to markers here
-    setChargingStationList(markers)
+    setChargingStationList(data)
   }
   useEffect(() => {
     GetAllCharger()
+  }, [])
+  useEffect(() => {
+    console.log(chargingStationList)
   }, [])
 
   return (
