@@ -1,19 +1,24 @@
 'use client'
 import { useEffect, useState } from "react";
 import { Card, Descriptions, DescriptionsProps, Button } from "antd"
+import { User } from "./page";
+
+interface ProviderDetailsProps {
+    user: User
+}
 
 // pass user as props
-function ProviderDetails({ user }: any) {
+function ProviderDetails({ user }: ProviderDetailsProps) {
     const [generalInfo, setGeneralInfo] = useState<DescriptionsProps['items']>([
         {
             key: '1',
             label: 'comapny',
-            children: "test company",
+            children: user.company_name,
         },
         {
             key: '2',
             label: 'e-mail',
-            children: "test@Test.com",
+            children: user.user_email,
         },
         {
             key: '3',
@@ -25,7 +30,7 @@ function ProviderDetails({ user }: any) {
     }, [])
     return (
         <Card type="inner" title="Provider">
-            <Descriptions title={user?.email} items={generalInfo!} />
+            <Descriptions title={user?.user_email} items={generalInfo!} />
         </Card>
     )
 }
