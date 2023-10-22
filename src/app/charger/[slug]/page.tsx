@@ -25,9 +25,17 @@ export interface Booking {
 }
 
 export interface CreateBookingReqObj {
-    chargerId: number
-    startTime: string
-    endTime: string
+    charger_id: number
+    start_time: string
+    end_time: string
+}
+
+export interface BookingResponseObj {
+    charger_id: number
+    email: string
+    start_time: string
+    end_time: string
+    status: string
 }
 
 const minInterval = ["00", "15", "30", "45"]
@@ -148,9 +156,9 @@ export default function ChargerBooking({ params }: { params: { slug: number } })
                 endTime = generateFullTime(selectedDate, time)
                 isBooking = false
                 let bookingReq: CreateBookingReqObj = {
-                    chargerId: params.slug,
-                    startTime: startTime,
-                    endTime: endTime
+                    charger_id: params.slug,
+                    start_time: startTime,
+                    end_time: endTime
                 }
                 // todo set loading function
                 createBookingReq(bookingReq)

@@ -1,53 +1,82 @@
 
 'use client'
 import React, { useEffect, useState } from 'react';
-import { Avatar, List, Radio, Space } from 'antd';
+import { Avatar, Button, List, Radio, Space } from 'antd';
 import { get } from 'http';
 import axios from 'axios';
 import { getJwtToken } from '../utils';
+import { Booking, BookingResponseObj } from '../charger/[slug]/page';
+import { Dayjs } from 'dayjs';
 
-const data = [
-    {
-        title: 'Ant Design Title 1',
-    },
-    {
-        title: 'Ant Design Title 2',
-    },
-    {
-        title: 'Ant Design Title 3',
-    },
-    {
-        title: 'Ant Design Title 4',
-    },
-];
 // declare booking interfaces
 const bookingOptions = ['upcoming booking', 'past booking'];
 const bookingUrl = String(process.env.NEXT_PUBLIC_REACT_APP_BASE_URL) + "/booking"
 
 function Booking() {
-    const [bookingList, setBookingList] = useState()
+    const [bookingList, setBookingList] = useState<BookingResponseObj[]>([])
     const [bookingOption, setBookingOption] = useState('upcoming booking')
-
+    const [isOngoingBooking, setIsOngoingBooking] = useState(false)
     async function GetUserBooking() {
         const jwtToken = await getJwtToken();
         console.log(jwtToken)
-        if (bookingOption == 'upcoming booking') {
-            const { data } = await axios.get(bookingUrl, {
-                headers: {
-                    Accept: 'application/json',
-                    Authentication: jwtToken?.toString()
-                }
-            })
-            console.log(data)
-        }
-        // todo: set data to markers here
-        // setBookingList(data)
+        const { data } = await axios.get(bookingUrl, {
+            headers: {
+                Accept: 'application/json',
+                Authentication: jwtToken?.toString()
+            }
+        })
+        console.log(data)
+
+        data.forEach((booking: BookingResponseObj, index: number) => {
+            if (bookingOption != "upcoming_booking" && booking.status == "completed") {
+                bookingList.push(booking)
+            } else if (booking.status == "ongoing") {
+                // check if end time < current time 
+                let currentDate = new Dayjs()
+                console.log("current date: ", currentDate)
+                setIsOngoingBooking(true)
+            } else {
+                // when it is history option
+                bookingList.push(booking)
+            }
+        })
+        setBookingList(bookingList)
     }
 
+    async function UpdateBookingReq(booking: BookingResponseObj) {
+        const jwtToken = await getJwtToken();
+        console.log(jwtToken)
+
+        const { data } = await axios.patch(bookingUrl, {
+            booking
+        }, {
+            headers: {
+                Accept: 'application/json',
+                Authentication: jwtToken?.toString()
+            }
+        })
+        console.log(data)
+    }
     useEffect(() => {
         GetUserBooking()
+        // check for ongoing complete is it completed.. if completed call update booking api to change it to completed
     }, [])
 
+
+
+    function updateBooking(index: number, status: string) {
+        let booking = bookingList[index]
+        booking.status = status
+        UpdateBookingReq(booking)
+        bookingList[index] = booking
+        setBookingList(bookingList)
+    }
+
+    function endCharging(index: number) {
+        bookingList[index].status = "completed"
+        setIsOngoingBooking(false)
+        setBookingList(bookingList)
+    }
 
     return (
         <>
@@ -71,16 +100,25 @@ function Booking() {
             </Space>
             <List
                 pagination={{ position: 'bottom', align: 'center' }}
-                dataSource={data}
+                dataSource={bookingList}
                 renderItem={(item, index) => (
                     <List.Item>
                         <List.Item.Meta
-                            avatar={
-                                <Avatar src={`https://xsgames.co/randomusers/avatar.php?g=pixel&key=${index}`} />
-                            }
-                            title={<a href="https://ant.design">{item.title}</a>}
-                            description="Ant Design, a design language for background applications, is refined by Ant UED Team"
+                            title={<a href="https://ant.design">{item.start_time}</a>}
+                            description={item.status}
                         />
+                        {!isOngoingBooking && <Button onClick={function () {
+                            updateBooking(index, "ongoing")
+                        }}>
+                            Start
+                        </Button>}
+
+                        {isOngoingBooking && <Button onClick={function () {
+                            updateBooking(index, "completed")
+                        }}>
+                            End Charging
+                        </Button>
+                        }
                     </List.Item>
                 )}
             />
