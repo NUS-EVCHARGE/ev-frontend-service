@@ -12,11 +12,11 @@ import { Dayjs } from 'dayjs';
 const bookingOptions = ['upcoming booking', 'past booking'];
 const bookingUrl = String(process.env.NEXT_PUBLIC_REACT_APP_BASE_URL) + "/booking"
 
-function Booking() {
+function BookingView() {
     const [bookingList, setBookingList] = useState<BookingResponseObj[]>([])
     const [bookingOption, setBookingOption] = useState('upcoming booking')
     const [isOngoingBooking, setIsOngoingBooking] = useState(false)
-    async function GetUserBooking() {
+    async function GetUserBooking(option: string) {
         const jwtToken = await getJwtToken();
         console.log(jwtToken)
         const { data } = await axios.get(bookingUrl, {
@@ -26,21 +26,26 @@ function Booking() {
             }
         })
         console.log(data)
-
+        let newBookingList: BookingResponseObj[] = []
         data.forEach((booking: BookingResponseObj, index: number) => {
-            if (bookingOption != "upcoming_booking" && booking.status == "completed") {
-                bookingList.push(booking)
-            } else if (booking.status == "ongoing") {
+            console.log(booking, bookingOption)
+            if (option != "upcoming booking" && booking.Status == "completed") {
+                // when it is history option
+                newBookingList.push(booking)
+            } else if (booking.Status == "ongoing") {
                 // check if end time < current time 
                 let currentDate = new Dayjs()
                 console.log("current date: ", currentDate)
                 setIsOngoingBooking(true)
-            } else {
+                newBookingList.push(booking)
+            } else if (option == "upcoming booking") {
                 // when it is history option
-                bookingList.push(booking)
+                newBookingList.push(booking)
             }
         })
-        setBookingList(bookingList)
+        console.log(newBookingList)
+
+        setBookingList(newBookingList)
     }
 
     async function UpdateBookingReq(booking: BookingResponseObj) {
@@ -57,12 +62,16 @@ function Booking() {
         })
         console.log(data)
     }
+
     useEffect(() => {
-        GetUserBooking()
+        GetUserBooking(bookingOption)
         // check for ongoing complete is it completed.. if completed call update booking api to change it to completed
     }, [])
 
-
+    useEffect(() => {
+        console.log(bookingList)
+        // check for ongoing complete is it completed.. if completed call update booking api to change it to completed
+    }, [bookingList])
 
     function updateBooking(index: number, status: string) {
         let booking = bookingList[index]
@@ -87,6 +96,7 @@ function Booking() {
                         value={bookingOption}
                         onChange={(e) => {
                             setBookingOption(e.target.value)
+                            GetUserBooking(e.target.value)
                             console.log(e.target.value);
                         }}
                     >
@@ -125,4 +135,4 @@ function Booking() {
         </>
     );
 }
-export default Booking
+export default BookingView
