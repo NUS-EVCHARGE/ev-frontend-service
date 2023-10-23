@@ -139,12 +139,13 @@ export default function ChargerBooking({ params }: { params: { slug: number } })
     };
 
     function onBookingSelected(key: string) {
-        let b = bookingList.get(key)
+        const newBookingList = new Map(bookingList)
+        let b = newBookingList.get(key)
         if (b != undefined) {
             b.selected = !b.selected
-            bookingList.set(key, b)
+            newBookingList.set(key, b)
         }
-        setBookingList(bookingList)
+        setBookingList(newBookingList)
     }
 
     function createBooking() {
