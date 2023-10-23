@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Select, Form, InputNumber, Input, Button, Space, Table, Popconfirm, Typography } from 'antd';
+import { Select, Dropdown, Form, Menu, InputNumber, Input, Button, Space, Table, Popconfirm, Typography } from 'antd';
 import type { MenuProps } from 'antd';
 import { message } from 'antd';
 import {UserOutlined } from '@ant-design/icons';
 import { getJwtToken } from '../utils/index';
 import axios from 'axios';
 import { ChargerUserDetailsProps } from './chargerDetails';
+import DropdownButton from 'antd/es/dropdown/dropdown-button';
 
 interface RatesType {
     key: number, //number, React.Key,
@@ -142,7 +143,6 @@ function ChargersList({ user }: ChargerUserDetailsProps) {
 
       const newData = [...dataSource] as RatesType[];
       const index = newData.findIndex((item) => key === item.key);
-      
       if (index > -1) {
         const item = newData[index];
         newData.splice(index, 1, {
@@ -164,11 +164,11 @@ function ChargersList({ user }: ChargerUserDetailsProps) {
     }
   };
 
-  const handleMenuClick: MenuProps['onClick'] = (e) => {
+  function handleMenuClick(e: any) {
     message.info('Click on menu item.');
     console.log('click', e);
   };
-  const dropdownitems: MenuProps['items'] = [
+  const items: MenuProps['items'] = [
     {
       label: 'Active',
       key: 'active',
@@ -181,12 +181,33 @@ function ChargersList({ user }: ChargerUserDetailsProps) {
     },
   ];
 
-  const handleChange = (value: string) => {
-    console.log(`selected ${value}`);
+  const handleBtnClick = (status: any, record: RatesType) => {
+    console.log("status", status)
+    console.log("record", record)
+  }
+
+  const handleChange = (record: any) => {
+    // const status = record.useState(record.status);
+    // console.log(`${record} selected ${status}`);
+    console.log("status", status)
+    console.log("record", record)
+    // Current row status is updated
+    // Update the status in the database
+    return null
   };
 
+  function handleButtonClick(e: any, record: RatesType) {
+    message.info('Click on left button.');
+    console.log('click left button', e);
+  }
+  const menu = (
+    <Menu onClick={handleMenuClick}>
+      <Menu.Item key="active">Active</Menu.Item>
+      <Menu.Item key="disabled">Disabled</Menu.Item>
+    </Menu>
+  )
   const menuProps = {
-    dropdownitems,
+    items,
     onClick: handleMenuClick,
   };
 
@@ -235,16 +256,20 @@ function ChargersList({ user }: ChargerUserDetailsProps) {
       dataIndex: 'noShowRate',
       key: 'noShowRate',
       editable: true,
-      render: (text: any) => <a>{parseFloat(text).toFixed(2)}</a>,
+      render: (text: any) => 
+        <a>
+        {text}
+        </a>
     },
     {
       title: 'Status',
-      key: 'status',
       dataIndex: 'status',
-      render: (status: string) => (
-        <span>
+      key: 'status',
+      render: (status: string) => {
+        return (
+          <div>
           <Select
-            defaultValue="disabled"
+            defaultValue="active"
             style={{ 
               width: 120,
               color: status == 'active' ? 'green' : 'red',
@@ -255,9 +280,13 @@ function ChargersList({ user }: ChargerUserDetailsProps) {
               { value: 'active', label: 'Active' },
               { value: 'disabled', label: 'Disabled' },
             ]}
-          />
-        </span>
-      ),
+            value={status}
+          >
+            {status}
+          </Select>
+          </div>
+        );
+      }
     },
     {
       title: 'Operation',
@@ -281,10 +310,6 @@ function ChargersList({ user }: ChargerUserDetailsProps) {
             <Typography.Link disabled={editingKey !== ''} onClick={() => edit(record)}>
               Edit
             </Typography.Link>
-            
-            {/* <Popconfirm title="Sure to delete?" okType={"default"} onConfirm={() => handleDelete(record.key)}>
-              <Button type="link">Delete</Button>
-            </Popconfirm> */}
           </Space>
         );
       },
@@ -318,13 +343,14 @@ function ChargersList({ user }: ChargerUserDetailsProps) {
       normalRate: "0",
       penaltyRate: "0",
       noShowRate: "0",
-      status: 'deactivated',
+      status: 'active',
     };
     AddCharger(newCharger);
   };
 
   const handlePatch = (newData: RatesType [], key: number) => {
     //Search for the row to be updated using the key
+    console.log("newData-1", newData)
     const rowData = newData.filter((item) => item.key == key);
     PatchCharger(rowData);
   }
@@ -348,6 +374,7 @@ function ChargersList({ user }: ChargerUserDetailsProps) {
       var newArr: RatesType[] = [];
   
       data.forEach((item: any) => {
+        console.log("item.rates.status", item.rates.status)
         newArr.push({
             key: item.id,
             chargerId: item.chargerId,
@@ -358,7 +385,7 @@ function ChargersList({ user }: ChargerUserDetailsProps) {
             normalRate: item.rates.normal_rate,
             penaltyRate: item.rates.penalty_rate,
             noShowRate: item.rates.no_show_penalty_rate,
-            status: 'active',
+            status: item.rates.status,
           });
       });
       setDataSource(newArr);
@@ -370,18 +397,20 @@ function ChargersList({ user }: ChargerUserDetailsProps) {
   // Function to add the charger
   async function AddCharger(newcharger: RatesType) {
     const jwtToken = await getJwtToken();
+    console.log("newcharger-01", newcharger)
+
     await axios.post(chargerRateURL, {
           "provider_id": provderId,
           "address": newcharger.address,
-          "lat": newcharger.lat,
-          "lng": newcharger.lng,
-          "status": "inactive",
+          "lat": parseFloat(newcharger.lat),
+          "lng": parseFloat(newcharger.lng),
+          "status": newcharger.status,
           "rates": {
               "provider_id": provderId,
-              "normal_rate": newcharger.normalRate,
-              "penalty_rate": newcharger.penaltyRate,
-              "no_show_penalty_rate": newcharger.noShowRate,
-              "Status": "inactive"
+              "normal_rate": parseFloat(newcharger.normalRate),
+              "penalty_rate": parseFloat(newcharger.penaltyRate),
+              "no_show_penalty_rate": parseFloat(newcharger.noShowRate),
+              "Status": newcharger.status
           }
       }, {
         headers: {
@@ -424,7 +453,8 @@ function ChargersList({ user }: ChargerUserDetailsProps) {
 
   // Function to PATCH the charger
   async function PatchCharger(charger: RatesType []) {
-    
+    console.log("patchCharger", charger[0].status)
+    console.log("PATCH", charger[0])
     const jwtToken = await getJwtToken();
     await axios.patch(chargerRateURL, {
           "id": charger[0].key,
@@ -490,6 +520,7 @@ function ChargersList({ user }: ChargerUserDetailsProps) {
             cell: EditableCell,
           },
         }}
+        // rowKey={(row) => row.id || row.nested.id || row.mac}
         bordered
         dataSource={dataSource}
         columns={mergedColumns} 
