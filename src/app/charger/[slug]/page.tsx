@@ -34,6 +34,7 @@ export interface CreateBookingReqObj {
 }
 
 export interface BookingResponseObj {
+    id: number
     charger_id: number
     email: string
     start_time: string

@@ -50,7 +50,6 @@ function BookingView() {
 
     async function UpdateBookingReq(booking: BookingResponseObj) {
         const jwtToken = await getJwtToken();
-        console.log(jwtToken)
 
         const { data } = await axios.patch(bookingUrl, {
             booking
@@ -61,6 +60,18 @@ function BookingView() {
             }
         })
         console.log(data)
+    }
+
+    async function DeleteBookingReq(id: number) {
+        const jwtToken = await getJwtToken();
+
+        const { data } = await axios.delete(bookingUrl + "/" + id, {
+            headers: {
+                Accept: 'application/json',
+                Authentication: jwtToken?.toString()
+            }
+        })
+        console.log("delete res: ", data)
     }
 
     useEffect(() => {
@@ -75,16 +86,23 @@ function BookingView() {
 
     function updateBooking(index: number, status: string) {
         let booking = bookingList[index]
-        booking.status = status
+        booking.Status = status
         UpdateBookingReq(booking)
         bookingList[index] = booking
         setBookingList(bookingList)
     }
 
     function endCharging(index: number) {
-        bookingList[index].status = "completed"
+        bookingList[index].Status = "completed"
         setIsOngoingBooking(false)
         setBookingList(bookingList)
+    }
+
+    function deleteBooking(index: number) {
+        // DeleteBookingReq(bookingList[index].id)
+        let newBookingList = new Array<BookingResponseObj>(...bookingList)
+        newBookingList.splice(index, 1)
+        setBookingList(newBookingList)
     }
 
     return (
@@ -115,8 +133,9 @@ function BookingView() {
                     <List.Item>
                         <List.Item.Meta
                             title={<a href="https://ant.design">{item.start_time}</a>}
-                            description={item.status}
+                            description={item.Status}
                         />
+
                         {!isOngoingBooking && <Button onClick={function () {
                             updateBooking(index, "ongoing")
                         }}>
@@ -129,6 +148,12 @@ function BookingView() {
                             End Charging
                         </Button>
                         }
+
+                        <Button style={{ margin: '5px' }} danger onClick={function () {
+                            deleteBooking(index)
+                        }}>
+                            Delete
+                        </Button>
                     </List.Item>
                 )}
             />
