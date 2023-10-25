@@ -7,7 +7,7 @@ import { Calendar, theme, Typography } from 'antd';
 import type { CalendarProps } from 'antd';
 import { Flex } from '@aws-amplify/ui-react';
 import axios from 'axios';
-import { generateFullTime, getJwtToken, isDateMatch, parseTime } from '@/app/utils';
+import { generateFullTime, getJwtToken, isDateMatch, isTimeMatch, parseTime } from '@/app/utils';
 import { create } from 'domain';
 import { start } from 'repl';
 
@@ -71,14 +71,19 @@ const getAllBookingUrl = baseUrl + "/booking/all"
 const bookingUrl = baseUrl + "/booking"
 
 export default function ChargerBooking({ params }: { params: { slug: number } }) {
-    const [selectedDate, setSelectedDate] = useState<Dayjs>()
+    const [selectedDate, setSelectedDate] = useState<string>()
     const [bookingList, setBookingList] = useState<Map<string, Booking>>(new Map());
     const { token } = theme.useToken();
     const router = useRouter();
     useEffect(() => {
+        console.log("use effect trigger")
         GetAllBooking()
-        setBookingList(stubBookingMap)
-    }, [])
+        // setBookingList(stubBookingMap)
+    }, [selectedDate])
+
+    useEffect(() => {
+        console.log(bookingList)
+    }, [bookingList])
 
     async function GetAllBooking() {
         const jwtToken = await getJwtToken();
@@ -90,26 +95,27 @@ export default function ChargerBooking({ params }: { params: { slug: number } })
         })
         console.log(data)
 
+        let newBookingList = new Map(stubBookingMap)
         for (let b of data) {
-            let setBooking = false
-            console.log(b)
-            bookingList.forEach((booking, time) => {
-
-                if (selectedDate != undefined && isDateMatch(selectedDate, b.start_time)) {
-                    setBooking = true
+            newBookingList.forEach((booking, time) => {
+                console.log("looping: ", b, selectedDate, time)
+                if (selectedDate != undefined) {
+                    if (isDateMatch(selectedDate, b.start_time) || isDateMatch(selectedDate, b.end_time)) {
+                        console.log("date matched")
+                        if (isTimeMatch(time, b.start_time)) {
+                            booking.status = true
+                        } else if (isTimeMatch(time, b.end_time)) {
+                            booking.status = false
+                        }
+                        console.log(booking)
+                        newBookingList.set(time, booking)
+                    }
+                } else {
+                    console.log("selected data is undefined")
                 }
-
-                if (selectedDate != undefined && isDateMatch(selectedDate, b.endTime)) {
-                    setBooking = false
-                }
-                console.log(setBooking)
-                booking.status = setBooking
-                bookingList.set(time, booking)
-                // setBookingList(bookingList)
             })
-            // setBookingList(bookingList)
         }
-        // get booking 
+        setBookingList(newBookingList)
     }
 
     async function createBookingReq(bookingReq: CreateBookingReqObj) {
@@ -183,7 +189,13 @@ export default function ChargerBooking({ params }: { params: { slug: number } })
                         onSelect={(date: Dayjs, { source }) => {
                             if (source === 'date') {
                                 console.log('Panel Select:', date.format('YYYY-MM-DD'));
-                                setSelectedDate(date)
+                                setSelectedDate(date.format("YYYY-MM-DD"))
+                                // let newBookingList = new Map(bookingList)
+                                // newBookingList.forEach((booking, time) => {
+                                //     booking.selected = false
+                                //     newBookingList.set(time, booking)
+                                // })
+                                // setBookingList(newBookingList)
                             }
                         }} />
 

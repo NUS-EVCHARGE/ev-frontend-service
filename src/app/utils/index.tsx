@@ -1,5 +1,7 @@
+import { ComponentPropsToStylePropsMap } from "@aws-amplify/ui-react";
 import { Auth } from "aws-amplify";
 import { Dayjs } from 'dayjs';
+import { parse } from "path";
 
 async function getJwtToken(): Promise<string | void> {
   if (!Auth || !Auth.currentAuthenticatedUser) {
@@ -14,6 +16,7 @@ async function getJwtToken(): Promise<string | void> {
 
 // parse time in the format 2023-10-28T16:35:48Z
 function parseTime(time: string): [string, string, string, string] {
+  console.log("parse time", time)
   const [wholeDate, wholeTime] = time.split("T")
   const [year, month, day] = wholeDate.split("-")
   const [parsedTime, _] = wholeTime.split("Z")
@@ -21,18 +24,24 @@ function parseTime(time: string): [string, string, string, string] {
 }
 
 // parse time in the format 2023-10-28T16:35:48Z and check with dayjs
-function isDateMatch(date: Dayjs, time: string): Boolean {
+function isDateMatch(date: string, time: string): Boolean {
+  // console.log("date matched called")
   const [day, month, year, parsedTime] = parseTime(time)
-  let wholeCompareDate = date.format("YYYY-MM-DD")
-  const [compareYear, compareMonth, compareDay] = wholeCompareDate.split("-")
+  const [compareYear, compareMonth, compareDay] = date.split("-")
   console.log(compareDay, compareMonth, compareYear, time)
   return compareDay == day && compareMonth == month && compareYear == year
 }
 
-function generateFullTime(date: Dayjs, time: string): string {
-  let wholeDate = date.format('YYYY-MM-DD')
+function isTimeMatch(compareTime: string, time: string): Boolean {
+  const [day, month, year, parsedTime] = parseTime(time)
+  let fullCompareTime = compareTime + ":00"
+  console.log("is time matched: ", fullCompareTime, parsedTime, "result: ", fullCompareTime === parsedTime)
+  return fullCompareTime.trim() === parsedTime.trim()
+}
+
+function generateFullTime(date: string, time: string): string {
 
   let wholeTime = time + ":00Z"
-  return wholeDate + "T" + wholeTime
+  return date + "T" + wholeTime
 }
-export { getJwtToken, parseTime, isDateMatch, generateFullTime };
+export { getJwtToken, parseTime, isDateMatch, generateFullTime, isTimeMatch };
