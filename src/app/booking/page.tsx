@@ -7,6 +7,7 @@ import axios from 'axios';
 import { getJwtToken } from '../utils';
 import { Booking, BookingResponseObj } from '../charger/[slug]/page';
 import { Dayjs } from 'dayjs';
+import { useRouter } from 'next/navigation';
 
 // declare booking interfaces
 const bookingOptions = ['upcoming booking', 'past booking'];
@@ -16,6 +17,8 @@ function BookingView() {
     const [bookingList, setBookingList] = useState<BookingResponseObj[]>([])
     const [bookingOption, setBookingOption] = useState('upcoming booking')
     const [isOngoingBooking, setIsOngoingBooking] = useState(false)
+    const router = useRouter()
+
     async function GetUserBooking(option: string) {
         const jwtToken = await getJwtToken();
         console.log(jwtToken)
@@ -34,11 +37,9 @@ function BookingView() {
                 newBookingList.push(booking)
             } else if (booking.Status == "ongoing") {
                 // check if end time < current time 
-                let currentDate = new Dayjs()
-                console.log("current date: ", currentDate)
                 setIsOngoingBooking(true)
                 newBookingList.push(booking)
-            } else if (option == "upcoming booking") {
+            } else if (option == "upcoming booking" && booking.Status != "completed") {
                 // when it is history option
                 newBookingList.push(booking)
             }
@@ -52,7 +53,11 @@ function BookingView() {
         const jwtToken = await getJwtToken();
 
         const { data } = await axios.patch(bookingUrl, {
-            booking
+            id: booking.id,
+            charger_id: booking.charger_id,
+            start_time: new Date(booking.start_time),
+            end_time: new Date(booking.end_time),
+            Status: booking.Status
         }, {
             headers: {
                 Accept: 'application/json',
@@ -60,6 +65,7 @@ function BookingView() {
             }
         })
         console.log(data)
+        setIsOngoingBooking(true)
     }
 
     async function DeleteBookingReq(id: number) {
@@ -85,11 +91,12 @@ function BookingView() {
     }, [bookingList])
 
     function updateBooking(index: number, status: string) {
-        let booking = bookingList[index]
+        let newBookingList = new Array<BookingResponseObj>(...bookingList)
+        let booking = newBookingList[index]
         booking.Status = status
         UpdateBookingReq(booking)
-        bookingList[index] = booking
-        setBookingList(bookingList)
+        newBookingList[index] = booking
+        setBookingList(newBookingList)
     }
 
     function endCharging(index: number) {
@@ -99,7 +106,7 @@ function BookingView() {
     }
 
     function deleteBooking(index: number) {
-        // DeleteBookingReq(bookingList[index].id)
+        DeleteBookingReq(bookingList[index].id)
         let newBookingList = new Array<BookingResponseObj>(...bookingList)
         newBookingList.splice(index, 1)
         setBookingList(newBookingList)
@@ -132,7 +139,7 @@ function BookingView() {
                 renderItem={(item, index) => (
                     <List.Item>
                         <List.Item.Meta
-                            title={<a href="https://ant.design">{item.start_time}</a>}
+                            title={"[" + item.start_time + "] to [" + item.end_time + "]"}
                             description={item.Status}
                         />
 
@@ -142,18 +149,24 @@ function BookingView() {
                             Start
                         </Button>}
 
-                        {isOngoingBooking && <Button onClick={function () {
+                        {isOngoingBooking && bookingOption != "past booking" && <Button onClick={function () {
                             updateBooking(index, "completed")
                         }}>
                             End Charging
                         </Button>
                         }
 
-                        <Button style={{ margin: '5px' }} danger onClick={function () {
+                        {!isOngoingBooking && <Button style={{ margin: '5px' }} danger onClick={function () {
                             deleteBooking(index)
                         }}>
                             Delete
-                        </Button>
+                        </Button>}
+
+                        {bookingOption == "past booking" && <Button onClick={function () {
+                            router.push("/bill")
+                        }}>
+                            Bill
+                        </Button>}
                     </List.Item>
                 )}
             />

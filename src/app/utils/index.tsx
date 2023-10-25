@@ -63,4 +63,8 @@ function generateFullTime(date: string, time: string): string {
   let wholeTime = time + ":00Z"
   return date + "T" + wholeTime
 }
-export { getJwtToken, parseTime, isDateMatch, generateFullTime, isTimeMatch, isTimeBeforeNow };
+
+function getReadableStringFromDate(date: Date): string {
+  return date.getFullYear + "-" + date.getMonth + "-" + date.getDay + " " + date.getHours + ":" + date.getMinutes
+}
+export { getJwtToken, parseTime, isDateMatch, generateFullTime, isTimeMatch, isTimeBeforeNow, getReadableStringFromDate };
