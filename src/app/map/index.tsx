@@ -55,14 +55,6 @@ const Map: React.FC<{ chargingStations: ChargingStationArray }> = ({
         lng: currentLocation.longitude
       })
       mapRef?.setZoom(10);
-      // const marker = new google.maps.Marker({
-      //   position: {
-      //     lat: currentLocation?.latitude,
-      //     lng: currentLocation?.longitude
-      //   },
-      //   map: mapRef,
-      //   icon: customMarker
-      // });
     }
 
     mapRef
