@@ -56,8 +56,6 @@ const Map: React.FC<{ chargingStations: ChargingStationArray }> = ({
       })
       mapRef?.setZoom(10);
     }
-
-    mapRef
   }, [currentLocation])
 
   const handleMarkerClick = (
