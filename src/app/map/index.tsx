@@ -4,6 +4,8 @@ import {
   useLoadScript,
   InfoWindow,
 } from "@react-google-maps/api";
+import { Button } from "antd";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export interface ChargingStation {
@@ -21,7 +23,7 @@ const Map: React.FC<{ chargingStations: ChargingStationArray }> = ({
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: String(process.env.NEXT_PUBLIC_REACT_APP_GOOGLE_API_KEY),
   });
-
+  const router = useRouter()
   const [mapRef, setMapRef] = useState<google.maps.Map>();
   const [isOpen, setIsOpen] = useState(false);
   const [infoWindowData, setInfoWindowData] = useState<{
@@ -43,6 +45,18 @@ const Map: React.FC<{ chargingStations: ChargingStationArray }> = ({
   useEffect(() => {
     getCurrentLocation();
   }, []);
+
+  useEffect(() => {
+    console.log(currentLocation)
+
+    if (currentLocation != undefined) {
+      mapRef?.setCenter({
+        lat: currentLocation.latitude,
+        lng: currentLocation.longitude
+      })
+      mapRef?.setZoom(10);
+    }
+  }, [currentLocation])
 
   const handleMarkerClick = (
     id: number,
@@ -110,7 +124,13 @@ const Map: React.FC<{ chargingStations: ChargingStationArray }> = ({
                     setIsOpen(false);
                   }}
                 >
-                  <h3 style={{ color: "black" }}>{infoWindowData?.address}</h3>
+                  {/* <h3 style={{ color: "black" }}>{infoWindowData?.address}</h3> */}
+                  {/* Add booking button */}
+                  <Button onClick={function () {
+                    router.push("/charger/" + id)
+                  }}>
+                    Book Now
+                  </Button>
                 </InfoWindow>
               )}
             </Marker>
