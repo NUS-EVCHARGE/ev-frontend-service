@@ -143,7 +143,7 @@ function BookingView() {
                             description={item.Status}
                         />
 
-                        {!isOngoingBooking && <Button onClick={function () {
+                        {!isOngoingBooking && bookingOption != "past booking" && <Button onClick={function () {
                             updateBooking(index, "ongoing")
                         }}>
                             Start
@@ -156,7 +156,7 @@ function BookingView() {
                         </Button>
                         }
 
-                        {!isOngoingBooking && <Button style={{ margin: '5px' }} danger onClick={function () {
+                        {!isOngoingBooking && bookingOption != "past booking" && <Button style={{ margin: '5px' }} danger onClick={function () {
                             deleteBooking(index)
                         }}>
                             Delete
