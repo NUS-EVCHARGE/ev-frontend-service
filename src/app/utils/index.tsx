@@ -39,9 +39,28 @@ function isTimeMatch(compareTime: string, time: string): Boolean {
   return fullCompareTime.trim() === parsedTime.trim()
 }
 
+function isTimeBeforeNow(selectedDate: string, compareTime: string): Boolean {
+  let timeNowHours = new Date().getHours()
+  let timeNowMin = new Date().getMinutes()
+  let timeDay = new Date().getDay()
+  let timeMonth = new Date().getMonth()
+  let timeYear = new Date().getFullYear()
+  let [compareTimeHour, compareTimeMin] = compareTime.split(":")
+  let [compareYear, compareMonth, compareDay] = selectedDate.split("-")
+
+  if (timeYear >= +compareYear && timeMonth >= +compareMonth && timeDay >= +compareDay) {
+    if (timeNowHours >= +compareTimeHour && timeNowMin > +compareTimeMin) {
+      return true
+    }
+  }
+
+  // console.log("compare timen now:", timeNow)
+  return false
+}
+
 function generateFullTime(date: string, time: string): string {
 
   let wholeTime = time + ":00Z"
   return date + "T" + wholeTime
 }
-export { getJwtToken, parseTime, isDateMatch, generateFullTime, isTimeMatch };
+export { getJwtToken, parseTime, isDateMatch, generateFullTime, isTimeMatch, isTimeBeforeNow };

@@ -7,7 +7,7 @@ import { Calendar, theme, Typography } from 'antd';
 import type { CalendarProps } from 'antd';
 import { Flex } from '@aws-amplify/ui-react';
 import axios from 'axios';
-import { generateFullTime, getJwtToken, isDateMatch, isTimeMatch, parseTime } from '@/app/utils';
+import { generateFullTime, getJwtToken, isDateMatch, isTimeBeforeNow, isTimeMatch, parseTime } from '@/app/utils';
 import { create } from 'domain';
 import { start } from 'repl';
 
@@ -20,8 +20,10 @@ export interface Booking {
     id: number
     hour: string
     min: string
+    endMin: string
     status: boolean
     selected: boolean
+    statusReason: string
 }
 
 export interface CreateBookingReqObj {
@@ -51,8 +53,10 @@ for (var h of hourInterval) {
             id: id,
             hour: h,
             min: m,
+            endMin: (+m + 14).toString(),
             status: false,
-            selected: false
+            selected: false,
+            statusReason: ""
         })
         // stubBooking.push(
         //     {
@@ -96,16 +100,30 @@ export default function ChargerBooking({ params }: { params: { slug: number } })
         console.log(data)
 
         let newBookingList = new Map(stubBookingMap)
+        newBookingList.forEach((booking, time) => {
+            booking.selected = false
+            booking.status = false
+        })
+
         for (let b of data) {
+            let setBooking = false
             newBookingList.forEach((booking, time) => {
                 console.log("looping: ", b, selectedDate, time)
                 if (selectedDate != undefined) {
                     if (isDateMatch(selectedDate, b.start_time) || isDateMatch(selectedDate, b.end_time)) {
                         console.log("date matched")
                         if (isTimeMatch(time, b.start_time)) {
+                            console.log("start time matched")
+
                             booking.status = true
-                        } else if (isTimeMatch(time, b.end_time)) {
+                            booking.statusReason = "booked"
+                            setBooking = true
+                        } else if (isTimeMatch(booking.hour + ":" + booking.endMin, b.end_time)) {
+                            console.log("end time matched")
                             booking.status = false
+                            setBooking = false
+                        } else if (setBooking) {
+                            booking.status = true
                         }
                         console.log(booking)
                         newBookingList.set(time, booking)
@@ -113,6 +131,7 @@ export default function ChargerBooking({ params }: { params: { slug: number } })
                 } else {
                     console.log("selected data is undefined")
                 }
+                booking.selected = false
             })
         }
         setBookingList(newBookingList)
@@ -131,13 +150,9 @@ export default function ChargerBooking({ params }: { params: { slug: number } })
                 Authentication: jwtToken?.toString()
             }
         })
-        console.log(data)
+        console.log("create booking: ", data)
     }
 
-    const onDateSelect = (value: Dayjs, mode: CalendarProps<Dayjs>['mode']) => {
-        console.log(value.format('YYYY-MM-DD'), mode);
-        setSelectedDate(value)
-    };
     const wrapperStyle: React.CSSProperties = {
         width: 300,
         border: `1px solid ${token.colorBorderSecondary}`,
@@ -164,7 +179,7 @@ export default function ChargerBooking({ params }: { params: { slug: number } })
                 isBooking = true
             }
             if (isBooking && !booking.selected && selectedDate != undefined) {
-                endTime = generateFullTime(selectedDate, time)
+                endTime = generateFullTime(selectedDate, booking.hour + ":" + booking.endMin)
                 isBooking = false
                 let bookingReq: CreateBookingReqObj = {
                     charger_id: +params.slug,
@@ -218,7 +233,7 @@ export default function ChargerBooking({ params }: { params: { slug: number } })
                             </Button> : <Button style={{ width: '80%', margin: 'auto' }} key={index} danger={b[1].selected} onClick={function () {
                                 onBookingSelected(b[0])
                             }}>
-                                {b[0]}
+                                {b[0]} - {b[1].hour}:{b[1].endMin}
                             </Button>}
                         </div>
                     ))
