@@ -175,8 +175,8 @@ function ChargersList({ user }: ChargerUserDetailsProps) {
       icon: <UserOutlined />,
     },
     {
-      label: 'Inactive',
-      key: 'inactive',
+      label: 'Disabled',
+      key: 'disabled',
       icon: <UserOutlined />,
     },
   ];
@@ -244,7 +244,7 @@ function ChargersList({ user }: ChargerUserDetailsProps) {
       render: (status: string) => (
         <span>
           <Select
-            defaultValue="inactive"
+            defaultValue="active"
             style={{ 
               width: 120,
               color: status == 'active' ? 'green' : 'red',
@@ -253,7 +253,7 @@ function ChargersList({ user }: ChargerUserDetailsProps) {
             disabled={selectEdit}
             options={[
               { value: 'active', label: 'Active' },
-              { value: 'inactive', label: 'Inactive' },
+              { value: 'disabled', label: 'Disabled' },
             ]}
           />
         </span>
@@ -298,7 +298,7 @@ function ChargersList({ user }: ChargerUserDetailsProps) {
       normalRate: "0",
       penaltyRate: "0",
       noShowRate: "0",
-      status: 'inactive',
+      status: 'active',
     };
     AddCharger(newCharger);
   };
