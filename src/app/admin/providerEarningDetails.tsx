@@ -76,7 +76,7 @@ function ProviderEarningDetails({ user }: ProviderEarningDetailsProps) {
     }, [])
     return (
         <Card type="inner" title="Earnings" extra={<Button> Cash out</Button>}>
-            <Descriptions title={user?.earnings} items={earningInfo!} />
+            <Descriptions title="" items={earningInfo!} />
         </Card>
     )
 }
