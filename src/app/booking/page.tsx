@@ -100,9 +100,12 @@ function BookingView() {
     }
 
     function endCharging(index: number) {
-        bookingList[index].Status = "completed"
-        setIsOngoingBooking(false)
-        setBookingList(bookingList)
+        let newBookingList = new Array<BookingResponseObj>(...bookingList)
+        let booking = newBookingList[index]
+        booking.Status = 'completed'
+        UpdateBookingReq(booking)
+        newBookingList[index] = booking
+        setBookingList(newBookingList)
     }
 
     function deleteBooking(index: number) {
@@ -149,8 +152,8 @@ function BookingView() {
                             Start
                         </Button>}
 
-                        {isOngoingBooking && bookingOption != "past booking" && <Button onClick={function () {
-                            updateBooking(index, "completed")
+                        {item.Status == "ongoing" && bookingOption != "past booking" && <Button onClick={function () {
+                            endCharging(index)
                         }}>
                             End Charging
                         </Button>
