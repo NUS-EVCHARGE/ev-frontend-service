@@ -18,6 +18,9 @@ import { getJwtToken } from "./utils";
 import Link from "next/link";
 import { Amplify } from "aws-amplify";
 import awsExports from "./aws-exports";
+import axios from "axios";
+import { User } from "./admin/page";
+import { MenuItemType } from "antd/es/menu/hooks/useItems";
 
 const { Header, Sider, Content } = Layout;
 const { Text } = Typography;
@@ -43,18 +46,38 @@ export default function RootLayout({
 }) {
   const [collapsed, setCollapsed] = useState(false);
   const [token, setToken] = useState("");
+  const [provider, setProvider] = useState<User>();
+  const [menu, setMenu] = useState<MenuItemType[]>();
 
   const {
     token: { colorBgContainer },
   } = theme.useToken();
+
+  async function getProviderDetails() {
+    const jwtToken = await getJwtToken();
+    const providerUrl = String(process.env.NEXT_PUBLIC_REACT_APP_BASE_URL) + "/provider";
+    await axios.get(providerUrl, {
+      headers: {
+        Accept: "application/json",
+        Authentication: jwtToken?.toString(),
+      },
+    }).then((res) => {
+      if (res.data != undefined) {
+        setProvider(res.data);
+      }
+    })
+  }
 
   useEffect(() => {
     async function getToken() {
       const jwtToken = await getJwtToken();
       if (jwtToken) {
         setToken(jwtToken);
+        getProviderDetails();
       }
     }
+
+
     if (!token) {
       getToken();
     }
@@ -73,35 +96,52 @@ export default function RootLayout({
                     theme="dark"
                     mode="inline"
                     defaultSelectedKeys={["1"]}
-                    items={[
-                      {
-                        key: "1",
-                        icon: <HomeOutlined />,
-                        label: <Link href="/"> Home </Link>,
-                      },
-                      {
-                        key: "2",
-                        icon: <BookOutlined />,
-                        label: <Link href="/booking"> Booking </Link>,
-                      },
-                      {
-                        key: "3",
-                        icon: <MoneyCollectOutlined />,
-                        label: <Link href="/bill"> Bill </Link>,
-                      },
-                      {
-                        key: "4",
-                        icon: <MoneyCollectOutlined />,
-                        label: <Link href="/admin"> Admin </Link>,
-                      },
-                      {
-                        key: "5",
-                        icon: <LogoutOutlined />,
-                        label: "sign out",
-                        danger: true,
-                        onClick: signOut,
-                      },
-                    ]}
+                    items={
+                      provider == undefined
+                        ? [
+                            {
+                              key: "1",
+                              icon: <HomeOutlined />,
+                              label: <Link href="/"> Home </Link>,
+                            },
+                            {
+                              key: "2",
+                              icon: <BookOutlined />,
+                              label: <Link href="/booking"> Booking </Link>,
+                            },
+                            {
+                              key: "3",
+                              icon: <MoneyCollectOutlined />,
+                              label: <Link href="/bill"> Bill </Link>,
+                            },
+                            {
+                              key: "4",
+                              icon: <MoneyCollectOutlined />,
+                              label: <Link href="/admin"> Admin </Link>,
+                            },
+                            {
+                              key: "5",
+                              icon: <LogoutOutlined />,
+                              label: "sign out",
+                              danger: true,
+                              onClick: signOut,
+                            },
+                          ]
+                        : [
+                            {
+                              key: "1",
+                              icon: <MoneyCollectOutlined />,
+                              label: <Link href="/admin"> Admin </Link>,
+                            },
+                            {
+                              key: "2",
+                              icon: <LogoutOutlined />,
+                              label: "sign out",
+                              danger: true,
+                              onClick: signOut,
+                            },
+                          ]
+                    }
                   ></Menu>
                 </Sider>
                 <Layout>
