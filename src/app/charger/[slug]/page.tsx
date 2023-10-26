@@ -98,7 +98,7 @@ export default function ChargerBooking({ params }: { params: { slug: number } })
                 Authentication: jwtToken?.toString()
             }
         })
-        console.log(data)
+        console.log("booking response: ", data)
 
         let newBookingList = new Map(stubBookingMap)
         newBookingList.forEach((booking, time) => {
@@ -108,9 +108,8 @@ export default function ChargerBooking({ params }: { params: { slug: number } })
 
         for (let b of data) {
             let setBooking = false
+            console.log("checking charger id", b.charger_id, params.slug)
             if (b.charger_id == params.slug) {
-
-
                 newBookingList.forEach((booking, time) => {
                     console.log("looping: ", b, selectedDate, time)
                     if (selectedDate != undefined) {
