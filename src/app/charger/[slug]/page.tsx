@@ -98,7 +98,7 @@ export default function ChargerBooking({ params }: { params: { slug: number } })
                 Authentication: jwtToken?.toString()
             }
         })
-        console.log(data)
+        console.log("booking response: ", data)
 
         let newBookingList = new Map(stubBookingMap)
         newBookingList.forEach((booking, time) => {
@@ -108,32 +108,35 @@ export default function ChargerBooking({ params }: { params: { slug: number } })
 
         for (let b of data) {
             let setBooking = false
-            newBookingList.forEach((booking, time) => {
-                console.log("looping: ", b, selectedDate, time)
-                if (selectedDate != undefined) {
-                    if (isDateMatch(selectedDate, b.start_time) || isDateMatch(selectedDate, b.end_time)) {
-                        console.log("date matched")
-                        if (isTimeMatch(time, b.start_time)) {
-                            console.log("start time matched")
+            console.log("checking charger id", b.charger_id, params.slug)
+            if (b.charger_id == params.slug) {
+                newBookingList.forEach((booking, time) => {
+                    console.log("looping: ", b, selectedDate, time)
+                    if (selectedDate != undefined) {
+                        if (isDateMatch(selectedDate, b.start_time) || isDateMatch(selectedDate, b.end_time)) {
+                            console.log("date matched")
+                            if (isTimeMatch(time, b.start_time)) {
+                                console.log("start time matched")
 
-                            booking.status = true
-                            booking.statusReason = "booked"
-                            setBooking = true
-                        } else if (isTimeMatch(booking.hour + ":" + booking.endMin, b.end_time)) {
-                            console.log("end time matched")
-                            booking.status = false
-                            setBooking = false
-                        } else if (setBooking) {
-                            booking.status = true
+                                booking.status = true
+                                booking.statusReason = "booked"
+                                setBooking = true
+                            } else if (isTimeMatch(booking.hour + ":" + booking.endMin, b.end_time)) {
+                                console.log("end time matched")
+                                booking.status = false
+                                setBooking = false
+                            } else if (setBooking) {
+                                booking.status = true
+                            }
+                            console.log(booking)
+                            newBookingList.set(time, booking)
                         }
-                        console.log(booking)
-                        newBookingList.set(time, booking)
+                    } else {
+                        console.log("selected data is undefined")
                     }
-                } else {
-                    console.log("selected data is undefined")
-                }
-                booking.selected = false
-            })
+                    booking.selected = false
+                })
+            }
         }
         setBookingList(newBookingList)
     }

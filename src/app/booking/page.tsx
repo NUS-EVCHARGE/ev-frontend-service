@@ -65,7 +65,6 @@ function BookingView() {
             }
         })
         console.log(data)
-        setIsOngoingBooking(true)
     }
 
     async function DeleteBookingReq(id: number) {
@@ -86,9 +85,9 @@ function BookingView() {
     }, [])
 
     useEffect(() => {
-        console.log(bookingList)
+        console.log(bookingList, isOngoingBooking)
         // check for ongoing complete is it completed.. if completed call update booking api to change it to completed
-    }, [bookingList])
+    }, [bookingList, isOngoingBooking])
 
     function updateBooking(index: number, status: string) {
         let newBookingList = new Array<BookingResponseObj>(...bookingList)
@@ -97,12 +96,17 @@ function BookingView() {
         UpdateBookingReq(booking)
         newBookingList[index] = booking
         setBookingList(newBookingList)
+        setIsOngoingBooking(true)
     }
 
     function endCharging(index: number) {
-        bookingList[index].Status = "completed"
+        let newBookingList = new Array<BookingResponseObj>(...bookingList)
+        let booking = newBookingList[index]
+        booking.Status = 'completed'
+        UpdateBookingReq(booking)
+        newBookingList.splice(index, 1)
+        setBookingList(newBookingList)
         setIsOngoingBooking(false)
-        setBookingList(bookingList)
     }
 
     function deleteBooking(index: number) {
@@ -149,8 +153,8 @@ function BookingView() {
                             Start
                         </Button>}
 
-                        {isOngoingBooking && bookingOption != "past booking" && <Button onClick={function () {
-                            updateBooking(index, "completed")
+                        {item.Status == "ongoing" && bookingOption != "past booking" && <Button onClick={function () {
+                            endCharging(index)
                         }}>
                             End Charging
                         </Button>
