@@ -52,7 +52,7 @@ const Payment = () => {
         // Create PaymentIntent as soon as the page loads
         async function getPaymentIntent(item: UserPaymentItem) {
             const jwtToken = await getJwtToken();
-            axios.post(process.env.NEXT_PUBLIC_REACT_APP_BASE_URL + '/payment/provider', item, {
+            axios.post(process.env.NEXT_PUBLIC_REACT_APP_BASE_URL + '/payment/user', item, {
                 headers: {
                     Accept: 'application/json',
                     Authentication: jwtToken?.toString()

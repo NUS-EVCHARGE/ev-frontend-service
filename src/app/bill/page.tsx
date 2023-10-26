@@ -22,7 +22,8 @@ type UserPaymentItem = {
     normalRate: number,
     bookingId: number,
     userEmail: string,
-    paymentStatus: string
+    paymentStatus: string,
+    ProviderID: number,
 }
 
 function Bill() {
