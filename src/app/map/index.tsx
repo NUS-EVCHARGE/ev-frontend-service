@@ -4,7 +4,7 @@ import {
   useLoadScript,
   InfoWindow,
 } from "@react-google-maps/api";
-import { Button } from "antd";
+import { Button, Modal, Alert } from "antd";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -104,7 +104,7 @@ const Map: React.FC<{ chargingStations: ChargingStationArray }> = ({
     <div style={{ height: "100%" }}>
       {!isLoaded ? (
         <h1>Loading...</h1>
-      ) : (
+      ) : currentLocation ? (
         <GoogleMap
           mapContainerStyle={{ height: "100%" }}
           onLoad={onMapLoad}
@@ -148,7 +148,12 @@ const Map: React.FC<{ chargingStations: ChargingStationArray }> = ({
             />
           )}
         </GoogleMap>
-      )}
+      )
+    : (
+      <Modal title="Location" open={!currentLocation} onOk={getCurrentLocation} onCancel={() => {}}>
+        <p>Location permission was denied. Please enable it in your browser settings.</p>
+      </Modal>
+    )}
     </div>
   );
 };
