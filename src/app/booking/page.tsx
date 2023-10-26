@@ -5,7 +5,7 @@ import { Avatar, Button, List, Radio, Space } from 'antd';
 import { get } from 'http';
 import axios from 'axios';
 import { getJwtToken } from '../utils';
-import { Booking, BookingResponseObj } from '../charger/[slug]/page';
+import { Booking, BookingResponseObj } from '../charger/page';
 import { Dayjs } from 'dayjs';
 import { useRouter } from 'next/navigation';
 

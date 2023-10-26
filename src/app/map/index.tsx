@@ -127,7 +127,9 @@ const Map: React.FC<{ chargingStations: ChargingStationArray }> = ({
                   {/* <h3 style={{ color: "black" }}>{infoWindowData?.address}</h3> */}
                   {/* Add booking button */}
                   <Button onClick={function () {
-                    router.push("/charger/" + id)
+                    const params = new URLSearchParams()
+                    params.set('chargerId', id.toString())
+                    router.push(`/charger?${params.toString()}`)
                   }}>
                     Book Now
                   </Button>

@@ -75,11 +75,15 @@ const baseUrl = String(process.env.NEXT_PUBLIC_REACT_APP_BASE_URL)
 const getAllBookingUrl = baseUrl + "/booking/all"
 const bookingUrl = baseUrl + "/booking"
 
-export default function ChargerBooking({ params }: { params: { slug: number } }) {
+export default function ChargerBooking() {
     const [selectedDate, setSelectedDate] = useState<string>()
     const [bookingList, setBookingList] = useState<Map<string, Booking>>(new Map());
     const { token } = theme.useToken();
     const router = useRouter();
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+    const chargerId = urlParams.get('chargerId');
+
     useEffect(() => {
         console.log("use effect trigger")
         GetAllBooking()
@@ -108,8 +112,8 @@ export default function ChargerBooking({ params }: { params: { slug: number } })
 
         for (let b of data) {
             let setBooking = false
-            console.log("checking charger id", b.charger_id, params.slug)
-            if (b.charger_id == params.slug) {
+            console.log("checking charger id", b.charger_id, chargerId)
+            if (b.charger_id == chargerId) {
                 newBookingList.forEach((booking, time) => {
                     console.log("looping: ", b, selectedDate, time)
                     if (selectedDate != undefined) {
@@ -186,7 +190,7 @@ export default function ChargerBooking({ params }: { params: { slug: number } })
                 endTime = generateFullTime(selectedDate, booking.hour + ":" + booking.endMin)
                 isBooking = false
                 let bookingReq: CreateBookingReqObj = {
-                    charger_id: +params.slug,
+                    charger_id: parseInt(chargerId ?? "0") ,
                     start_time: startTime,
                     end_time: endTime,
                     Status: "waiting"
