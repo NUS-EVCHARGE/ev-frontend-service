@@ -4,6 +4,7 @@ import { Card, Space, Typography } from "antd";
 import axios from "axios";
 import { getJwtToken } from "../../utils";
 import { UserPaymentItem } from "../page";
+import { getPaymentBaseUrlWithUser } from "@/app/api/config";
 
 const { Title, Text } = Typography;
 
@@ -20,9 +21,8 @@ export default function Receipt() {
       const jwtToken = await getJwtToken();
       axios
         .get(
-          process.env.NEXT_PUBLIC_REACT_APP_BASE_URL +
-            "/payment/user/" +
-            booking,
+          getPaymentBaseUrlWithUser() +
+          booking,
           {
             headers: {
               Accept: "application/json",
@@ -49,25 +49,25 @@ export default function Receipt() {
       <Space direction="vertical" align="center">
         <Title>Receipt for Booking Number {receipt?.bookingId}</Title>
         <Text>
-            Email: {receipt?.userEmail}
+          Email: {receipt?.userEmail}
         </Text>
         <Text>
-            Charger Address: {receipt?.chargerAddress}
+          Charger Address: {receipt?.chargerAddress}
         </Text>
         <Text>
-            Charger ID: {receipt?.charger_id}
+          Charger ID: {receipt?.charger_id}
         </Text>
         <Text>
-            Start Date Time: {new Date(receipt?.start_time).toLocaleString("en-SG")} 
+          Start Date Time: {new Date(receipt?.start_time).toLocaleString("en-SG")}
         </Text>
         <Text>
-            End Date Time: {new Date(receipt?.end_time).toLocaleString("en-SG")} 
+          End Date Time: {new Date(receipt?.end_time).toLocaleString("en-SG")}
         </Text>
         <Text>
-            Total Price: {receipt?.TotalBill}
+          Total Price: {receipt?.TotalBill}
         </Text>
         <Text>
-            Payment Status: {receipt?.paymentStatus}
+          Payment Status: {receipt?.paymentStatus}
         </Text>
       </Space>
     </Card>

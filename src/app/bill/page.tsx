@@ -5,13 +5,14 @@ import { Avatar, Button, List, Radio, Space } from 'antd';
 import { useRouter, useSearchParams } from 'next/navigation';
 import axios from 'axios';
 import { getJwtToken } from '../utils';
+import { getAllBookingByPaymentUrl } from '../api/config';
 
-const billOption = ['outstanding', 'completed'];    
+const billOption = ['outstanding', 'completed'];
 
 type UserPaymentItem = {
     id: number,
     charger_id: number,
-    chargerAddress : string,
+    chargerAddress: string,
     TotalBill: number,
     FinalBill: number,
     Coupon: string,
@@ -55,7 +56,7 @@ function Bill() {
 
         async function getAllUserPayment() {
             const jwtToken = await getJwtToken()
-            axios.get(process.env.NEXT_PUBLIC_REACT_APP_BASE_URL + '/payment/user/getAllBooking', {
+            axios.get(getAllBookingByPaymentUrl(), {
                 headers: {
                     Accept: 'application/json',
                     Authentication: jwtToken?.toString()
@@ -69,7 +70,7 @@ function Bill() {
         }
 
         getAllUserPayment()
-    },[]);
+    }, []);
 
     return (
         <>
@@ -101,29 +102,29 @@ function Bill() {
                                 <Avatar src={`https://xsgames.co/randomusers/avatar.php?g=pixel&key=${index}`} />
                             }
                             title={<a href="https://ant.design">Bookng Number: {item.id}
-                            <br/> Total Bill: ${item.TotalBill}</a>}    
+                                <br /> Total Bill: ${item.TotalBill}</a>}
                             description={
-                            <a>Start time: {new Date(item.start_time).toLocaleString("en-SG")} - End time: {new Date(item.end_time).toLocaleString("en-SG")}
-                            <br/>Location: {item.chargerAddress}
-                            </a>
+                                <a>Start time: {new Date(item.start_time).toLocaleString("en-SG")} - End time: {new Date(item.end_time).toLocaleString("en-SG")}
+                                    <br />Location: {item.chargerAddress}
+                                </a>
                             }
                         />
                         {
-                        currentBillOption == "outstanding" ? 
-                        <Button onClick={() => {    
-                            const newParams = new URLSearchParams(params.toString());
-                            newParams.set('bookingId', item.bookingId.toString());
-                            router.push(`${pathName}payment?${newParams.toString()}`);
-                        }}>
-                            Pay
-                        </Button> : 
-                        <Button onClick={() => {    
-                            const newParams = new URLSearchParams(params.toString());
-                            newParams.set('bookingId', item.bookingId.toString());
-                            router.push(`${pathName}receipt?${newParams.toString()}`);
-                        }}>
-                            Receipt
-                        </Button>
+                            currentBillOption == "outstanding" ?
+                                <Button onClick={() => {
+                                    const newParams = new URLSearchParams(params.toString());
+                                    newParams.set('bookingId', item.bookingId.toString());
+                                    router.push(`${pathName}payment?${newParams.toString()}`);
+                                }}>
+                                    Pay
+                                </Button> :
+                                <Button onClick={() => {
+                                    const newParams = new URLSearchParams(params.toString());
+                                    newParams.set('bookingId', item.bookingId.toString());
+                                    router.push(`${pathName}receipt?${newParams.toString()}`);
+                                }}>
+                                    Receipt
+                                </Button>
                         }
                     </List.Item>
                 )}

@@ -6,6 +6,7 @@ import ProviderEarningDetails from "./providerEarningDetails"
 import ChargerDetails from "./chargerDetails"
 import axios from "axios"
 import { getJwtToken } from "../utils"
+import { getProviderBaseUrl } from "../api/config"
 
 const { Title } = Typography
 const dummyData = {
@@ -25,7 +26,7 @@ type User = {
 function Admin() {
     const [loading, setIsLoading] = useState(true)
     const [user, setUser] = useState<User>()
-    const providerUrl = String(process.env.NEXT_PUBLIC_REACT_APP_BASE_URL) + "/provider"
+    const providerUrl = getProviderBaseUrl()
 
     async function getProviderDetails() {
         const jwtToken = await getJwtToken();

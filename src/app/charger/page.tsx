@@ -10,6 +10,7 @@ import axios from 'axios';
 import { generateFullTime, getJwtToken, isDateMatch, isTimeBeforeNow, isTimeMatch, parseTime } from '@/app/utils';
 import { create } from 'domain';
 import { start } from 'repl';
+import { getBookingBaseUrl } from '../api/config';
 
 const { Text } = Typography
 const onPanelChange = (value: Dayjs, mode: CalendarProps<Dayjs>['mode']) => {
@@ -71,9 +72,9 @@ for (var h of hourInterval) {
         id++
     }
 }
-const baseUrl = String(process.env.NEXT_PUBLIC_REACT_APP_BASE_URL)
-const getAllBookingUrl = baseUrl + "/booking/all"
-const bookingUrl = baseUrl + "/booking"
+
+const bookingUrl = getBookingBaseUrl()
+const getAllBookingUrl = bookingUrl + "all"
 
 export default function ChargerBooking() {
     const [selectedDate, setSelectedDate] = useState<string>()
@@ -190,7 +191,7 @@ export default function ChargerBooking() {
                 endTime = generateFullTime(selectedDate, booking.hour + ":" + booking.endMin)
                 isBooking = false
                 let bookingReq: CreateBookingReqObj = {
-                    charger_id: parseInt(chargerId ?? "0") ,
+                    charger_id: parseInt(chargerId ?? "0"),
                     start_time: startTime,
                     end_time: endTime,
                     Status: "waiting"

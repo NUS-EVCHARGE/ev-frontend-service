@@ -6,6 +6,7 @@ import CheckoutForm from "./checkout";
 import axios from "axios";
 import { getJwtToken } from "../../utils";
 import { UserPaymentItem } from "../page";
+import { getAllBookingByPaymentUrl, getPaymentBaseUrlWithUser } from "@/app/api/config";
 // Make sure to call loadStripe outside of a component’s render to avoid
 // recreating the Stripe object on every render.
 // This is your test publishable API key.
@@ -18,17 +19,17 @@ interface PageProps {
 
 const Payment = () => {
     const [clientSecret, setClientSecret] = useState("");
-    
+
     useEffect(() => {
         const queryString = window.location.search;
         const urlParams = new URLSearchParams(queryString);
         const bookingId = urlParams.get('bookingId');
 
-        const booking : number = typeof bookingId === 'string' ? parseInt(bookingId) : 0;
+        const booking: number = typeof bookingId === 'string' ? parseInt(bookingId) : 0;
 
         async function getAllUserPayment() {
             const jwtToken = await getJwtToken()
-            axios.get(process.env.NEXT_PUBLIC_REACT_APP_BASE_URL + '/payment/user/getAllBooking', {
+            axios.get(getAllBookingByPaymentUrl(), {
                 headers: {
                     Accept: 'application/json',
                     Authentication: jwtToken?.toString()
@@ -52,11 +53,11 @@ const Payment = () => {
         // Create PaymentIntent as soon as the page loads
         async function getPaymentIntent(item: UserPaymentItem) {
             const jwtToken = await getJwtToken();
-            axios.post(process.env.NEXT_PUBLIC_REACT_APP_BASE_URL + '/payment/user', item, {
+            axios.post(getPaymentBaseUrlWithUser(), item, {
                 headers: {
                     Accept: 'application/json',
                     Authentication: jwtToken?.toString()
-                }   
+                }
             }).then((res) => {
                 console.log(res)
                 setClientSecret(res.data.stripe)

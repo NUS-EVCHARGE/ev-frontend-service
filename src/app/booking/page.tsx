@@ -8,10 +8,11 @@ import { getJwtToken } from '../utils';
 import { Booking, BookingResponseObj } from '../charger/page';
 import { Dayjs } from 'dayjs';
 import { useRouter } from 'next/navigation';
+import { getBookingBaseUrl } from '../api/config';
 
 // declare booking interfaces
 const bookingOptions = ['upcoming booking', 'past booking'];
-const bookingUrl = String(process.env.NEXT_PUBLIC_REACT_APP_BASE_URL) + "/booking"
+const bookingUrl = getBookingBaseUrl()
 
 function BookingView() {
     const [bookingList, setBookingList] = useState<BookingResponseObj[]>([])

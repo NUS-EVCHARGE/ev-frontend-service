@@ -8,6 +8,7 @@ import { loadStripe } from "@stripe/stripe-js";
 import axios from "axios";
 import { UserPaymentItem } from "../page";
 import { getJwtToken } from "../../utils";
+import { getAllBookingByPaymentUrl, getUserPaymentCompleteUrl } from "@/app/api/config";
 
 const { Title, Text } = Typography;
 
@@ -26,12 +27,12 @@ function PaymentCompletePage() {
 
   const getUserPayment = async () => {
     const jwtToken = await getJwtToken()
-    const response = axios.get(process.env.NEXT_PUBLIC_REACT_APP_BASE_URL + "/payment/user/getAllBooking", {
-          headers: {
-            Accept: 'application/json',
-            Authentication: jwtToken?.toString()
-        }
-      })
+    const response = axios.get(getAllBookingByPaymentUrl(), {
+      headers: {
+        Accept: 'application/json',
+        Authentication: jwtToken?.toString()
+      }
+    })
       .then((response) => {
         console.log(response.data);
         return response.data['pending'].find((item: UserPaymentItem) => item.bookingId == Number(bookingId)) as UserPaymentItem;
@@ -43,12 +44,11 @@ function PaymentCompletePage() {
     return response;
   };
 
-  const updateUserPayment = async (item : UserPaymentItem) => {
+  const updateUserPayment = async (item: UserPaymentItem) => {
     const jwtToken = await getJwtToken()
     const response = axios
       .post(
-        process.env.NEXT_PUBLIC_REACT_APP_BASE_URL +
-          `/payment/user/completed`, item,
+        getUserPaymentCompleteUrl(), item,
         {
           headers: {
             Accept: "application/json",
@@ -76,7 +76,7 @@ function PaymentCompletePage() {
     }).catch((error) => {
       console.log(error);
     });
-  } 
+  }
 
   useEffect(() => {
 
@@ -107,26 +107,26 @@ function PaymentCompletePage() {
       }
     });
 
-  },[clientSecret, stripe]);
-  
+  }, [clientSecret, stripe]);
+
   return (
-      <Card>
-        <Space direction="vertical" align="center">
-          <Title>{message}</Title>
-          <Text>
-            Thank you for your payment. We willl send you a confirmation email.
-          </Text>
-        </Space>
-      </Card>
+    <Card>
+      <Space direction="vertical" align="center">
+        <Title>{message}</Title>
+        <Text>
+          Thank you for your payment. We willl send you a confirmation email.
+        </Text>
+      </Space>
+    </Card>
   );
 }
 
 export default function PaymentCompletePageWrapper() {
   return (
     <Suspense fallback="loading">
-       <Elements stripe={stripePromise}>
-      <PaymentCompletePage />
-    </Elements>
+      <Elements stripe={stripePromise}>
+        <PaymentCompletePage />
+      </Elements>
     </Suspense>
   );
 }

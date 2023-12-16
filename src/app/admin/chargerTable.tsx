@@ -2,22 +2,23 @@ import React, { useEffect, useState } from 'react';
 import { Select, Form, InputNumber, Input, Button, Space, Table, Popconfirm, Typography } from 'antd';
 import type { MenuProps } from 'antd';
 import { message } from 'antd';
-import {UserOutlined } from '@ant-design/icons';
+import { UserOutlined } from '@ant-design/icons';
 import { getJwtToken } from '../utils/index';
 import axios from 'axios';
 import { ChargerUserDetailsProps } from './chargerDetails';
+import { getChargerBaseUrl, getChargerRateUrl } from '../api/config';
 
 interface RatesType {
-    key: number, //number, React.Key,
-    chargerId: string,
-    address: string,
-    lat: string,
-    lng: string,
-    rateId : number,
-    normalRate: string,
-    penaltyRate: string,
-    noShowRate: string,
-    status: string,
+  key: number, //number, React.Key,
+  chargerId: string,
+  address: string,
+  lat: string,
+  lng: string,
+  rateId: number,
+  normalRate: string,
+  penaltyRate: string,
+  noShowRate: string,
+  status: string,
 }
 
 type TablePaginationPosition =
@@ -106,7 +107,8 @@ const EditableCell: React.FC<EditableCellProps> = ({
 
 function ChargersList({ user }: ChargerUserDetailsProps) {
   const provderId = user.id;
-  const chargerRateURL = String(process.env.NEXT_PUBLIC_REACT_APP_BASE_URL) + `/provider/${provderId}/chargerandrate`
+  const chargerRateURL = getChargerRateUrl(provderId)
+
   const [editingKey, setEditingKey] = useState('');
   const [selectEdit, setSelectEdit] = useState(false);
   const [form] = Form.useForm();
@@ -128,7 +130,7 @@ function ChargersList({ user }: ChargerUserDetailsProps) {
       // Update Select Component props disabled to false
 
     } else { // Not in edit mode
-      setSelectEdit(true); 
+      setSelectEdit(true);
     }
   }, [editingKey]);
 
@@ -142,7 +144,7 @@ function ChargersList({ user }: ChargerUserDetailsProps) {
 
       const newData = [...dataSource] as RatesType[];
       const index = newData.findIndex((item) => key === item.key);
-      
+
       if (index > -1) {
         const item = newData[index];
         newData.splice(index, 1, {
@@ -245,7 +247,7 @@ function ChargersList({ user }: ChargerUserDetailsProps) {
         <span>
           <Select
             defaultValue="active"
-            style={{ 
+            style={{
               width: 120,
               color: status == 'active' ? 'green' : 'red',
             }}
@@ -288,7 +290,7 @@ function ChargersList({ user }: ChargerUserDetailsProps) {
   ];
 
   const handleAdd = () => {
-    const newCharger : RatesType = {
+    const newCharger: RatesType = {
       key: 0,
       chargerId: "0",
       address: '',
@@ -303,7 +305,7 @@ function ChargersList({ user }: ChargerUserDetailsProps) {
     AddCharger(newCharger);
   };
 
-  const handlePatch = (newData: RatesType [], key: number) => {
+  const handlePatch = (newData: RatesType[], key: number) => {
     //Search for the row to be updated using the key
     const rowData = newData.filter((item) => item.key == key);
     if (rowData.length > 0) {
@@ -316,59 +318,59 @@ function ChargersList({ user }: ChargerUserDetailsProps) {
     setDataSource(newData);
     DeleteCharger(key.toString());
   };
-  
+
   // Get Charger details and rates for the provider
   async function GetChargers() {
     const jwtToken = await getJwtToken();
     await axios.get(chargerRateURL, {
-        headers: {
-            "Accept": 'application/json',
-            "authentication": jwtToken?.toString()
-        }
+      headers: {
+        "Accept": 'application/json',
+        "authentication": jwtToken?.toString()
+      }
     }).then((res) => {
       const data: ChargerRate[] = res.data
       var newArr: RatesType[] = [];
-  
+
       data.forEach((item: any) => {
         newArr.push({
-            key: item.id,
-            chargerId: item.chargerId,
-            address: item.address,
-            lat: item.lat,
-            lng: item.lng,
-            rateId: item.rates.id,
-            normalRate: item.rates.normal_rate,
-            penaltyRate: item.rates.penalty_rate,
-            noShowRate: item.rates.no_show_penalty_rate,
-            status: 'active',
-          });
+          key: item.id,
+          chargerId: item.chargerId,
+          address: item.address,
+          lat: item.lat,
+          lng: item.lng,
+          rateId: item.rates.id,
+          normalRate: item.rates.normal_rate,
+          penaltyRate: item.rates.penalty_rate,
+          noShowRate: item.rates.no_show_penalty_rate,
+          status: 'active',
+        });
       });
       setDataSource(newArr);
     }).catch((err) => {
       console.log(err);
     });
   }
-  
+
   // Function to add the charger
   async function AddCharger(newcharger: RatesType) {
     const jwtToken = await getJwtToken();
     await axios.post(chargerRateURL, {
-          "provider_id": provderId,
-          "address": newcharger.address,
-          "lat": parseFloat(newcharger.lat),
-          "lng": parseFloat(newcharger.lng),
-          "status": newcharger.status,
-          "rates": {
-              "provider_id": provderId,
-              "normal_rate": parseFloat(newcharger.normalRate),
-              "penalty_rate": parseFloat(newcharger.penaltyRate),
-              "no_show_penalty_rate": parseFloat(newcharger.noShowRate),
-              "Status": newcharger.status
-          }
-      }, {
-        headers: {
-          Accept: 'application/json',
-          Authentication: jwtToken?.toString()
+      "provider_id": provderId,
+      "address": newcharger.address,
+      "lat": parseFloat(newcharger.lat),
+      "lng": parseFloat(newcharger.lng),
+      "status": newcharger.status,
+      "rates": {
+        "provider_id": provderId,
+        "normal_rate": parseFloat(newcharger.normalRate),
+        "penalty_rate": parseFloat(newcharger.penaltyRate),
+        "no_show_penalty_rate": parseFloat(newcharger.noShowRate),
+        "Status": newcharger.status
+      }
+    }, {
+      headers: {
+        Accept: 'application/json',
+        Authentication: jwtToken?.toString()
       }
     }).then((res) => {
 
@@ -386,7 +388,7 @@ function ChargersList({ user }: ChargerUserDetailsProps) {
         status: data.status,
       };
       setDataSource([...dataSource, newData]);
-      
+
     }).catch((err) => {
       console.log(err);
     })
@@ -396,92 +398,92 @@ function ChargersList({ user }: ChargerUserDetailsProps) {
   async function DeleteCharger(chargerId: string) {
     const jwtToken = await getJwtToken();
     const { data } = await axios.delete(chargerRateURL, {
-        headers: {
-            "Accept": 'application/json',
-            "authentication": jwtToken?.toString()
-        }
+      headers: {
+        "Accept": 'application/json',
+        "authentication": jwtToken?.toString()
+      }
     });
   };
 
   // Function to PATCH the charger
   async function PatchCharger(charger: RatesType) {
-    
+
     const jwtToken = await getJwtToken();
 
-    const item : ChargerRate = {
-        id: charger.key,
+    const item: ChargerRate = {
+      id: charger.key,
+      provider_id: provderId,
+      address: charger.address,
+      lat: parseFloat(charger.lat),
+      lng: parseFloat(charger.lng),
+      status: charger.status,
+      rates: {
+        id: charger.rateId,
         provider_id: provderId,
-        address: charger.address,
-        lat: parseFloat(charger.lat),
-        lng: parseFloat(charger.lng),
-        status: charger.status,
-        rates: {
-            id: charger.rateId,
-            provider_id: provderId,
-            normal_rate: parseFloat(charger.normalRate),
-            penalty_rate: parseFloat(charger.penaltyRate),
-            no_show_penalty_rate: parseFloat(charger.noShowRate),
-            status: charger.status
-        },
+        normal_rate: parseFloat(charger.normalRate),
+        penalty_rate: parseFloat(charger.penaltyRate),
+        no_show_penalty_rate: parseFloat(charger.noShowRate),
+        status: charger.status
+      },
     }
-    await axios.patch(chargerRateURL, item , {
-        headers: {
-            "Accept": 'application/json',
-            "authentication": jwtToken?.toString()
-        }
+    await axios.patch(chargerRateURL, item, {
+      headers: {
+        "Accept": 'application/json',
+        "authentication": jwtToken?.toString()
+      }
     }).then((res) => {
       const data: ChargerRate = res.data
     }).catch((err) => {
       console.log(err);
     });
   };
-  
+
   const [top, setTop] = useState<TablePaginationPosition>('topCenter');
   const [bottom, setBottom] = useState<TablePaginationPosition>('bottomCenter');
 
-    useEffect(() => {
-      GetChargers();
-    }, []);
+  useEffect(() => {
+    GetChargers();
+  }, []);
 
-    const mergedColumns = columns.map((col) => {
-      if (!col.editable) {
-        return col;
-      }
-      // console.log("col", col)
-      // console.log("col.dataIndex", col.dataIndex)
-      return {
-        ...col,
-        onCell: (record: RatesType) => ({
-          record,
-          inputType: col.dataIndex === 'id' ? 'number' : 'text',
-          dataIndex: col.dataIndex,
-          title: col.title,
-          editing: isEditing(record),
-        }),
-        
-      };
-    });
+  const mergedColumns = columns.map((col) => {
+    if (!col.editable) {
+      return col;
+    }
+    // console.log("col", col)
+    // console.log("col.dataIndex", col.dataIndex)
+    return {
+      ...col,
+      onCell: (record: RatesType) => ({
+        record,
+        inputType: col.dataIndex === 'id' ? 'number' : 'text',
+        dataIndex: col.dataIndex,
+        title: col.title,
+        editing: isEditing(record),
+      }),
+
+    };
+  });
 
   return (
     <div>
-    <Button onClick={handleAdd} style={{ marginBottom: 16 }}>Add a Charger</Button>
-    <Form form={form} component={false}>
-      <Table 
-        components={{
-          body: {
-            cell: EditableCell,
-          },
-        }}
-        bordered
-        dataSource={dataSource}
-        columns={mergedColumns} 
-        rowClassName="editable-row"
-        pagination={{ 
-                      onChange: cancel, 
-                      position: [bottom] 
-                    }}  
-                  />
-    </Form>
+      <Button onClick={handleAdd} style={{ marginBottom: 16 }}>Add a Charger</Button>
+      <Form form={form} component={false}>
+        <Table
+          components={{
+            body: {
+              cell: EditableCell,
+            },
+          }}
+          bordered
+          dataSource={dataSource}
+          columns={mergedColumns}
+          rowClassName="editable-row"
+          pagination={{
+            onChange: cancel,
+            position: [bottom]
+          }}
+        />
+      </Form>
     </div>
   )
 }

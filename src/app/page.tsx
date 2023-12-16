@@ -4,6 +4,7 @@ import Map from './map';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { getJwtToken } from './utils';
+import { getChargerBaseUrl } from './api/config';
 
 
 const markers: ChargingStationArray = [
@@ -11,7 +12,7 @@ const markers: ChargingStationArray = [
   { id: 2, address: "Address2", lat: 1.3332674, lng: 103.6367302 },
 ];
 
-const chargerUrl = String(process.env.NEXT_PUBLIC_REACT_APP_BASE_URL) + "/charger"
+const chargerUrl = getChargerBaseUrl()
 
 
 function App() {

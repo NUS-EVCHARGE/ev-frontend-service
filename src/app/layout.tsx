@@ -21,6 +21,7 @@ import awsExports from "./aws-exports";
 import axios from "axios";
 import { User } from "./admin/page";
 import { MenuItemType } from "antd/es/menu/hooks/useItems";
+import { getProviderBaseUrl } from "./api/config";
 
 const { Header, Sider, Content } = Layout;
 const { Text } = Typography;
@@ -55,7 +56,7 @@ export default function RootLayout({
 
   async function getProviderDetails() {
     const jwtToken = await getJwtToken();
-    const providerUrl = String(process.env.NEXT_PUBLIC_REACT_APP_BASE_URL) + "/provider";
+    const providerUrl = getProviderBaseUrl();
     await axios.get(providerUrl, {
       headers: {
         Accept: "application/json",
@@ -99,48 +100,48 @@ export default function RootLayout({
                     items={
                       provider == undefined
                         ? [
-                            {
-                              key: "1",
-                              icon: <HomeOutlined />,
-                              label: <Link href="/"> Home </Link>,
-                            },
-                            {
-                              key: "2",
-                              icon: <BookOutlined />,
-                              label: <Link href="/booking"> Booking </Link>,
-                            },
-                            {
-                              key: "3",
-                              icon: <MoneyCollectOutlined />,
-                              label: <Link href="/bill"> Bill </Link>,
-                            },
-                            {
-                              key: "4",
-                              icon: <MoneyCollectOutlined />,
-                              label: <Link href="/admin"> Admin </Link>,
-                            },
-                            {
-                              key: "5",
-                              icon: <LogoutOutlined />,
-                              label: "sign out",
-                              danger: true,
-                              onClick: signOut,
-                            },
-                          ]
+                          {
+                            key: "1",
+                            icon: <HomeOutlined />,
+                            label: <Link href="/"> Home </Link>,
+                          },
+                          {
+                            key: "2",
+                            icon: <BookOutlined />,
+                            label: <Link href="/booking"> Booking </Link>,
+                          },
+                          {
+                            key: "3",
+                            icon: <MoneyCollectOutlined />,
+                            label: <Link href="/bill"> Bill </Link>,
+                          },
+                          {
+                            key: "4",
+                            icon: <MoneyCollectOutlined />,
+                            label: <Link href="/admin"> Admin </Link>,
+                          },
+                          {
+                            key: "5",
+                            icon: <LogoutOutlined />,
+                            label: "sign out",
+                            danger: true,
+                            onClick: signOut,
+                          },
+                        ]
                         : [
-                            {
-                              key: "1",
-                              icon: <MoneyCollectOutlined />,
-                              label: <Link href="/admin"> Admin </Link>,
-                            },
-                            {
-                              key: "2",
-                              icon: <LogoutOutlined />,
-                              label: "sign out",
-                              danger: true,
-                              onClick: signOut,
-                            },
-                          ]
+                          {
+                            key: "1",
+                            icon: <MoneyCollectOutlined />,
+                            label: <Link href="/admin"> Admin </Link>,
+                          },
+                          {
+                            key: "2",
+                            icon: <LogoutOutlined />,
+                            label: "sign out",
+                            danger: true,
+                            onClick: signOut,
+                          },
+                        ]
                     }
                   ></Menu>
                 </Sider>

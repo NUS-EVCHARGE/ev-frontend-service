@@ -5,6 +5,7 @@ import axios from "axios";
 import { getJwtToken } from "../utils";
 import { UserPaymentItem } from "../bill/page";
 import { User } from "./page";
+import { getProviderEarningsDetailsUrl } from "../api/config";
 
 interface ProviderEarningDetailsProps {
     user: User
@@ -33,7 +34,7 @@ function ProviderEarningDetails({ user }: ProviderEarningDetailsProps) {
         // get earning details
         const getEarningDetails = async () => {
             const jwtToken = await getJwtToken()
-            const response = axios.get(process.env.NEXT_PUBLIC_REACT_APP_BASE_URL + `/payment/provider/totalEarnings/${user.id}`, {
+            const response = axios.get(getProviderEarningsDetailsUrl(user.id), {
                 headers: {
                     Accept: 'application/json',
                     Authentication: jwtToken?.toString()
@@ -41,27 +42,27 @@ function ProviderEarningDetails({ user }: ProviderEarningDetailsProps) {
             })
                 .then((response) => {
                     console.log(response.data);
-                    const totalBill : number = response.data.TotalEarnings
-                    const totalCommission : number = response.data.TotalCommission
-                    const netEarnings : number = response.data.NetEarnings
+                    const totalBill: number = response.data.TotalEarnings
+                    const totalCommission: number = response.data.TotalCommission
+                    const netEarnings: number = response.data.NetEarnings
                     if (totalBill && totalCommission && netEarnings) {
                         setEarningInfo([
                             {
-                              key: '1',
-                              label: 'Net earnings',
-                              children: `$${netEarnings.toFixed(2)}`, // added comma here
+                                key: '1',
+                                label: 'Net earnings',
+                                children: `$${netEarnings.toFixed(2)}`, // added comma here
                             },
                             {
-                              key: '2',
-                              label: 'Gross earnings',
-                              children: `$${totalBill.toFixed(2)}`, // added comma here
+                                key: '2',
+                                label: 'Gross earnings',
+                                children: `$${totalBill.toFixed(2)}`, // added comma here
                             },
                             {
-                              key: '3',
-                              label: 'platform fee',
-                              children: `$${totalCommission.toFixed(2)}`,
+                                key: '3',
+                                label: 'platform fee',
+                                children: `$${totalCommission.toFixed(2)}`,
                             }
-                          ]);
+                        ]);
                     }
                 })
                 .catch((error) => {
